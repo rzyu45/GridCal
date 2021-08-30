@@ -262,13 +262,17 @@ def jacobian2(Y, S, V, pq, pv):
                                                      Gi=Y.indices, Gp=Y.indptr, Gx=Y.data.real,
                                                      Bx=Y.data.imag, P=S.real, Q=S.imag,
                                                      E=V.real, F=V.imag,
-                                                     pq=pq, pqpv=np.r_[pq, pv])
+                                                     pq=pq, pqpv=np.r_[pv, pq])
+
+    Jx = np.resize(Jx, nnz)
+    Ji = np.resize(Ji, nnz)
 
     return sp.csc_matrix((Jx, Ji, Jp), shape=(n_rows, n_cols))
 
 
 if __name__ == '__main__':
-    fname = '/home/santi/Documentos/Git/GitHub/GridCal/Grids_and_profiles/grids/Lynn 5 Bus (pq).gridcal'
+    # fname = '/home/santi/Documentos/Git/GitHub/GridCal/Grids_and_profiles/grids/Lynn 5 Bus (pq).gridcal'
+    fname = '/home/santi/Documentos/Git/GitHub/GridCal/Grids_and_profiles/grids/IEEE14 - ntc areas.gridcal'
 
     grid = gc.FileOpen(fname).open()
     nc = gc.compile_snapshot_opf_circuit(grid)
@@ -282,4 +286,4 @@ if __name__ == '__main__':
                   pq=nc.pq,
                   pv=nc.pv)
     print(J.toarray())
-    print()
+    print(J.shape)

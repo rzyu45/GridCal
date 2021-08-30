@@ -159,12 +159,14 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
     return Jx, Ji, Jp, n_rows, n_cols, nnz
 
 
-def AC_jacobian(Y, S, V, pq, pv):
+def AC_jacobian(Y, S, V, pq, pvpq):
 
     Jx, Ji, Jp, n_rows, n_cols, nnz = jacobian_numba(nbus=len(S),
                                                      Gi=Y.indices, Gp=Y.indptr, Gx=Y.data.real,
                                                      Bx=Y.data.imag, P=S.real, Q=S.imag,
                                                      E=V.real, F=V.imag,
-                                                     pq=pq, pvpq=np.r_[pq, pv])
+                                                     pq=pq, pvpq=pvpq)
+    Jx = np.resize(Jx, nnz)
+    Ji = np.resize(Ji, nnz)
 
     return sp.csc_matrix((Jx, Ji, Jp), shape=(n_rows, n_cols))
