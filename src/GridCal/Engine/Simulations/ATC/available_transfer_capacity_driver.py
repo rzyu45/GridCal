@@ -39,6 +39,116 @@ class AvailableTransferMode(Enum):
     GenerationAndLoad = 3
 
 
+def compute_dP(ptdf, P0, Pinstalled, idx1, idx2, bus_types, dT=1.0, mode=0):
+    """
+    Compute the generator node share
+    :param ptdf: Power transfer distribution factors (n-branch, n-bus)
+    :param P0: all bus injections [p.u.]
+    :param idx1: bus indices of the sending region
+    :param idx2: bus indices of the receiving region
+    :param bus_types: Array of bus types {1: pq, 2: pv, 3: slack}
+    :param dT: Exchange amount
+    :param mode: Type of power shift
+                 0: shift generation based on the current generated power
+                 1: shift generation based on the installed power
+                 2: shift load
+                 3 (or else): shift using generation and load
+
+    :return: Exchange sensitivity vector for all the lines
+    """
+
+    nbr = ptdf.shape[0]
+    nbus = ptdf.shape[1]
+
+    # declare the bus injections increment due to the transference
+    dP = np.zeros(nbus)
+
+    if mode == 0:  # move the generators based on the generated power --------------------
+        # set the sending power increment proportional to the current power (Area 1)
+        n1 = 0.0
+        for i in idx1:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                n1 += P0[i]
+
+        for i in idx1:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                dP[i] = dT * P0[i] / abs(n1)
+
+        # set the receiving power increment proportional to the current power (Area 2)
+        n2 = 0.0
+        for i in idx2:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                n2 += P0[i]
+
+        for i in idx2:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                dP[i] = -dT * P0[i] / abs(n2)
+
+    elif mode == 1:  # move the generators based on the installed power --------------------
+
+        # set the sending power increment proportional to the current power (Area 1)
+        n1 = 0.0
+        for i in idx1:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                n1 += Pinstalled[i]
+
+        for i in idx1:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                dP[i] = dT * Pinstalled[i] / abs(n1)
+
+        # set the receiving power increment proportional to the current power (Area 2)
+        n2 = 0.0
+        for i in idx2:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                n2 += Pinstalled[i]
+
+        for i in idx2:
+            if bus_types[i] == 2 or bus_types[i] == 3:  # it is a PV or slack node
+                dP[i] = -dT * Pinstalled[i] / abs(n2)
+
+    elif mode == 2:  # move the load ------------------------------------------------------
+
+        # set the sending power increment proportional to the current power (Area 1)
+        n1 = 0.0
+        for i in idx1:
+            if bus_types[i] == 1:  # it is a PV or slack node
+                n1 += P0[i]
+
+        for i in idx1:
+            if bus_types[i] == 1:  # it is a PV or slack node
+                dP[i] = dT * P0[i] / abs(n1)
+
+        # set the receiving power increment proportional to the current power (Area 2)
+        n2 = 0.0
+        for i in idx2:
+            if bus_types[i] == 1:  # it is a PV or slack node
+                n2 += P0[i]
+
+        for i in idx2:
+            if bus_types[i] == 1:  # it is a PV or slack node
+                dP[i] = -dT * P0[i] / abs(n2)
+
+    else:  # move all of it -----------------------------------------------------------------
+
+        # set the sending power increment proportional to the current power
+        n1 = 0.0
+        for i in idx1:
+            n1 += P0[i]
+
+        for i in idx1:
+            dP[i] = dT * P0[i] / abs(n1)
+
+        # set the receiving power increment proportional to the current power
+        n2 = 0.0
+        for i in idx2:
+            n2 += P0[i]
+
+        for i in idx2:
+            dP[i] = -dT * P0[i] / abs(n2)
+
+    return dP
+
+
 @nb.njit()
 def compute_alpha(ptdf, P0, Pinstalled, idx1, idx2, bus_types, dT=1.0, mode=0):
     """
@@ -57,6 +167,7 @@ def compute_alpha(ptdf, P0, Pinstalled, idx1, idx2, bus_types, dT=1.0, mode=0):
 
     :return: Exchange sensitivity vector for all the lines
     """
+
 
     nbr = ptdf.shape[0]
     nbus = ptdf.shape[1]

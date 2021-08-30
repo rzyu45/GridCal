@@ -319,7 +319,7 @@ def NR_LS(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max_it=15, mu_0=1.0,
 
             # evaluate Jacobian
             # J = Jacobian(Ybus, V, Ibus, pq, pvpq)
-            J = AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
+            J = AC_jacobian(Ybus, Scalc, V, pq, pvpq)
 
             # compute update step
             dx = linear_solver(J, f)
@@ -611,7 +611,7 @@ def IwamotoNR(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max_it=15,
 
             # evaluate Jacobian
             # J = Jacobian(Ybus, V, Ibus, pq, pvpq)
-            J = AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
+            J = AC_jacobian(Ybus, Scalc, V, pq, pvpq)
 
             # compute update step
             try:
@@ -744,6 +744,8 @@ def levenberg_marquardt_pf(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max
         nn = 2 * npq + npv
         Idn = sp.diags(np.ones(nn))  # csc_matrix identity
 
+        Scalc = V * np.conj(Ybus * V - Ibus)
+
         # generate lookup pvpq -> index pvpq (used in createJ)
         pvpq_lookup = np.zeros(np.max(Ybus.indices) + 1, dtype=int)
         pvpq_lookup[pvpq] = np.arange(len(pvpq))
@@ -752,7 +754,7 @@ def levenberg_marquardt_pf(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max
 
             # evaluate Jacobian
             if update_jacobian:
-                H = AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
+                H = AC_jacobian(Ybus, Scalc, V, pq, pvpq)
                 # H = Jacobian(Ybus, V, Ibus, pq, pvpq)
 
             # evaluate the solution error F(x0)
