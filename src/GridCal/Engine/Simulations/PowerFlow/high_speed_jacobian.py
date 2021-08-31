@@ -33,8 +33,10 @@ import numba as nb
 import numpy as np
 import scipy.sparse as sp
 
+
+
 @nb.njit()
-def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
+def jacobian_numba(Gi, Gp, Gx, Bx, P, Q, E, F, Vm, pq, pvpq):
     """
     Compute the Tinney version of the AC jacobian without any sin, cos or abs
     (Lynn book page 89)
@@ -48,7 +50,7 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
     :param pv: array of pv indices
     :return: CSC Jacobian matrix
     """
-    npqpv = len(pvpq)
+    npvpq = len(pvpq)
     n_rows = len(pvpq) + len(pq)
     n_cols = len(pvpq) + len(pq)
 
@@ -60,11 +62,13 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
     Jp[p] = 0
 
     # generate lookup for the non immediate axis (for CSC it is the rows) -> index lookup
-    lookup_pqpv = np.zeros(nbus, dtype=nb.int32)
-    lookup_pqpv[pvpq] = np.arange(len(pvpq), dtype=nb.int32)
+    lookup_pvpq = np.zeros(len(Gi) + 1, dtype=nb.int32)
+    lookup_pvpq[pvpq] = np.arange(npvpq, dtype=nb.int32)
 
-    lookup_pq = np.zeros(nbus, dtype=nb.int32)
+    lookup_pq = np.zeros(len(Gi) + 1, dtype=nb.int32)
     lookup_pq[pq] = np.arange(len(pq), dtype=nb.int32)
+
+    Vm2 = Vm * Vm
 
     for j in pvpq:  # sliced columns
 
@@ -73,7 +77,7 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
 
             # row index translation to the "rows" space
             i = Gi[k]
-            ii = lookup_pqpv[i]
+            ii = lookup_pvpq[i]
 
             if pvpq[ii] == i:  # rows
                 # entry found
@@ -81,7 +85,7 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
                     Jx[nnz] = F[i] * (Gx[k] * E[j] - Bx[k] * F[j]) - \
                               E[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
-                    Jx[nnz] = -Q[i] - Bx[k] * (E[i] + F[i])
+                    Jx[nnz] = - Q[i] - Bx[k] * Vm2[i]  # TODO: this fails
 
                 Ji[nnz] = ii
                 nnz += 1
@@ -99,9 +103,9 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
                     Jx[nnz] = - E[i] * (Gx[k] * E[j] - Bx[k] * F[j]) \
                               - F[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
-                    Jx[nnz] = P[i] - Gx[k] * (E[i] + F[i])
+                    Jx[nnz] = P[i] - Gx[k] * Vm2[i]
 
-                Ji[nnz] = ii + npqpv
+                Ji[nnz] = ii + npvpq
                 nnz += 1
 
         p += 1
@@ -115,15 +119,15 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
 
             # row index translation to the "rows" space
             i = Gi[k]
-            ii = lookup_pqpv[i]
+            ii = lookup_pvpq[i]
 
             if pvpq[ii] == i:  # rows
                 # entry found
                 if i != j:
                     Jx[nnz] = E[i] * (Gx[k] * E[j] - Bx[k] * F[j]) \
-                              + F[i] * (Bx[k] * E[j] + Gx[k] * F[j])
+                            + F[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
-                    Jx[nnz] = P[i] + Gx[k] * (E[i] + F[i])
+                    Jx[nnz] = P[i] + Gx[k] * Vm2[i]
 
                 Ji[nnz] = ii
                 nnz += 1
@@ -139,11 +143,11 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
                 # entry found
                 if i != j:
                     Jx[nnz] = F[i] * (Gx[k] * E[j] - Bx[k] * F[j]) \
-                              - E[i] * (Bx[k] * E[j] + Gx[k] * F[j])
+                            - E[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
-                    Jx[nnz] = Q[i] - Bx[k] * (E[i] + F[i])
+                    Jx[nnz] = Q[i] - Bx[k] * Vm2[i]
 
-                Ji[nnz] = ii + npqpv
+                Ji[nnz] = ii + npvpq
                 nnz += 1
 
         p += 1
@@ -161,10 +165,9 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, pq, pvpq):
 
 def AC_jacobian(Y, S, V, pq, pvpq):
 
-    Jx, Ji, Jp, n_rows, n_cols, nnz = jacobian_numba(nbus=len(S),
-                                                     Gi=Y.indices, Gp=Y.indptr, Gx=Y.data.real,
+    Jx, Ji, Jp, n_rows, n_cols, nnz = jacobian_numba(Gi=Y.indices, Gp=Y.indptr, Gx=Y.data.real,
                                                      Bx=Y.data.imag, P=S.real, Q=S.imag,
-                                                     E=V.real, F=V.imag,
+                                                     E=V.real, F=V.imag, Vm=np.abs(V),
                                                      pq=pq, pvpq=pvpq)
     Jx = np.resize(Jx, nnz)
     Ji = np.resize(Ji, nnz)
