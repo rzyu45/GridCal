@@ -82,10 +82,9 @@ def jacobian_numba(Gi, Gp, Gx, Bx, P, Q, E, F, Vm, pq, pvpq):
             if pvpq[ii] == i:  # rows
                 # entry found
                 if i != j:
-                    Jx[nnz] = F[i] * (Gx[k] * E[j] - Bx[k] * F[j]) - \
-                              E[i] * (Bx[k] * E[j] + Gx[k] * F[j])
+                    Jx[nnz] = F[i] * (Gx[k] * E[j] - Bx[k] * F[j]) - E[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
-                    Jx[nnz] = - Q[i] - Bx[k] * Vm2[i]  # TODO: this fails
+                    Jx[nnz] = - Q[i] - Bx[k] * Vm2[i]
 
                 Ji[nnz] = ii
                 nnz += 1
@@ -100,8 +99,7 @@ def jacobian_numba(Gi, Gp, Gx, Bx, P, Q, E, F, Vm, pq, pvpq):
             if pq[ii] == i:  # rows
                 # entry found
                 if i != j:
-                    Jx[nnz] = - E[i] * (Gx[k] * E[j] - Bx[k] * F[j]) \
-                              - F[i] * (Bx[k] * E[j] + Gx[k] * F[j])
+                    Jx[nnz] = - E[i] * (Gx[k] * E[j] - Bx[k] * F[j]) - F[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
                     Jx[nnz] = P[i] - Gx[k] * Vm2[i]
 
@@ -124,8 +122,7 @@ def jacobian_numba(Gi, Gp, Gx, Bx, P, Q, E, F, Vm, pq, pvpq):
             if pvpq[ii] == i:  # rows
                 # entry found
                 if i != j:
-                    Jx[nnz] = E[i] * (Gx[k] * E[j] - Bx[k] * F[j]) \
-                            + F[i] * (Bx[k] * E[j] + Gx[k] * F[j])
+                    Jx[nnz] = E[i] * (Gx[k] * E[j] - Bx[k] * F[j]) + F[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
                     Jx[nnz] = P[i] + Gx[k] * Vm2[i]
 
@@ -142,8 +139,7 @@ def jacobian_numba(Gi, Gp, Gx, Bx, P, Q, E, F, Vm, pq, pvpq):
             if pq[ii] == i:  # rows
                 # entry found
                 if i != j:
-                    Jx[nnz] = F[i] * (Gx[k] * E[j] - Bx[k] * F[j]) \
-                            - E[i] * (Bx[k] * E[j] + Gx[k] * F[j])
+                    Jx[nnz] = F[i] * (Gx[k] * E[j] - Bx[k] * F[j]) - E[i] * (Bx[k] * E[j] + Gx[k] * F[j])
                 else:
                     Jx[nnz] = Q[i] - Bx[k] * Vm2[i]
 
