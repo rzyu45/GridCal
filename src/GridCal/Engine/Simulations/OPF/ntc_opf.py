@@ -436,8 +436,8 @@ class OpfNTC(Opf):
                 delta_slack_1[gen_idx] = self.solver.NumVar(0, self.inf, name + '_delta_slack_up')
                 delta_slack_2[gen_idx] = self.solver.NumVar(0, self.inf, name + '_delta_slack_down')
                 prop = abs(Pgen[gen_idx] / sum_gen_1)
-                self.solver.Add(delta[gen_idx] == prop * power_shift, 'Delta_up_gen{}'.format(gen_idx))
-                self.solver.Add(generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx] + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Gen_up_gen{}'.format(gen_idx))
+                delta[gen_idx] = prop * power_shift
+                generation[gen_idx] = Pgen[gen_idx] + delta[gen_idx] + delta_slack_1[gen_idx] - delta_slack_2[gen_idx]
             else:
                 generation[gen_idx] = Pgen[gen_idx]
                 delta[gen_idx] = 0
@@ -463,8 +463,8 @@ class OpfNTC(Opf):
                 delta_slack_2[gen_idx] = self.solver.NumVar(0, self.inf, name + '_delta_slack_down')
 
                 prop = abs(Pgen[gen_idx] / sum_gen_2)
-                self.solver.Add(delta[gen_idx] == - prop * power_shift, 'Delta_down_gen{}'.format(gen_idx))
-                self.solver.Add(generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx] + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Gen_down_gen{}'.format(gen_idx))
+                delta[gen_idx] = - prop * power_shift
+                generation[gen_idx] = Pgen[gen_idx] + delta[gen_idx] + delta_slack_1[gen_idx] - delta_slack_2[gen_idx]
             else:
                 generation[gen_idx] = Pgen[gen_idx]
                 delta[gen_idx] = 0
@@ -491,6 +491,8 @@ class OpfNTC(Opf):
         :return:
         """
         theta = np.zeros(self.numerical_circuit.nbus, dtype=object)
+        theta_pos = np.zeros(self.numerical_circuit.nbus, dtype=object)
+        theta_neg = np.zeros(self.numerical_circuit.nbus, dtype=object)
 
         for i in range(self.numerical_circuit.nbus):
 
@@ -498,15 +500,18 @@ class OpfNTC(Opf):
                 self.logger.add_error('Theta min > Theta max', 'Bus {0}'.format(i),
                                       self.numerical_circuit.bus_data.angle_min[i])
 
-            theta[i] = self.solver.NumVar(self.numerical_circuit.bus_data.angle_min[i],
-                                          self.numerical_circuit.bus_data.angle_max[i],
-                                          'theta' + str(i))
+            theta_pos[i] = self.solver.NumVar(0, self.numerical_circuit.bus_data.angle_max[i], 'theta_pos_' + str(i))
+
+            # angle_min is negative already
+            theta_neg[i] = self.solver.NumVar(0, -self.numerical_circuit.bus_data.angle_min[i], 'theta_neg_' + str(i))
+
+            theta[i] = theta_pos[i] - theta_neg[i]
 
         if set_ref_to_zero:
             for i in self.numerical_circuit.vd:
                 self.solver.Add(theta[i] == 0, "Slack_angle_zero_" + str(i))
 
-        return theta
+        return theta, theta_pos, theta_neg
 
     def formulate_power_injections(self, Cgen, generation, t=0):
         """
@@ -725,7 +730,7 @@ class OpfNTC(Opf):
                             inter_area_branches, flows_f, overload1, overload2, n1overload1, n1overload2,
                             inter_area_hvdc, hvdc_flow_f, hvdc_overload1, hvdc_overload2, hvdc_control1, hvdc_control2,
                             power_shift, dgen1, gen_cost, generation_delta,
-                            delta_slack_1, delta_slack_2):
+                            delta_slack_1, delta_slack_2, theta_pos, theta_neg):
         """
 
         :param node_balance_slack_1:
@@ -775,6 +780,8 @@ class OpfNTC(Opf):
 
         delta_slacks = self.solver.Sum(delta_slack_1) + self.solver.Sum(delta_slack_2)
 
+        theta_fobj = self.solver.Sum(theta_pos) + self.solver.Sum(theta_neg)
+
         # formulate objective function
         f = - self.weight_power_shift * area_1_gen_delta
         f -= self.weight_power_shift * power_shift
@@ -790,6 +797,7 @@ class OpfNTC(Opf):
         f += self.weight_overloads * contingency_branch_overload
         f += self.weight_overloads * hvdc_overload
         f += self.weight_hvdc_control * hvdc_control
+        f += theta_fobj
 
         # objective function
         self.solver.Minimize(f)
@@ -900,7 +908,7 @@ class OpfNTC(Opf):
                                                                              t=t)
 
         # add the angles
-        theta = self.formulate_angles()
+        theta, theta_pos, theta_neg = self.formulate_angles(set_ref_to_zero=True)
 
         # formulate the power injections
         Pinj = self.formulate_power_injections(Cgen=Cgen, generation=generation, t=t)
@@ -951,7 +959,9 @@ class OpfNTC(Opf):
                                                    gen_cost=gen_cost[gen_a1_idx],
                                                    generation_delta=generation_delta[gen_a1_idx],
                                                    delta_slack_1=delta_slack_1,
-                                                   delta_slack_2=delta_slack_2)
+                                                   delta_slack_2=delta_slack_2,
+                                                   theta_pos=theta_pos,
+                                                   theta_neg=theta_neg)
 
         # Assign variables to keep
         # transpose them to be in the format of GridCal: time, device
