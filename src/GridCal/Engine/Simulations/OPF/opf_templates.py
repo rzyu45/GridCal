@@ -77,8 +77,9 @@ class Opf:
             self.solver = solver_type
 
         if self.solver is not None:
-
             self.problem = self.formulate()
+        else:
+            self.logger.add_error("Solver {} not found".format(self.solver_type.value))
 
     def formulate(self):
         """
