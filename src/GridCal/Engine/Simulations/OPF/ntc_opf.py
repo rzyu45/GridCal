@@ -243,22 +243,16 @@ def formulate_optimal_generation(solver: pywraplp.Solver,
     for bus_idx, gen_idx in gens1:
 
         if generator_active[gen_idx] and dispatchable[gen_idx]:
-            name = 'Gen_up_{0}@bus{1}_{2}'.format(gen_idx, bus_idx, generator_names[gen_idx])
-
-            ul = Pmax[gen_idx] - Pgen[gen_idx]
-
-            if ul <= 0:
-                logger.add_error('Pmax < Pgen in a regulation up generator', 'Generator index {0}'.format(gen_idx), ul)
 
             if Pmin[gen_idx] >= Pmax[gen_idx]:
                 logger.add_error('Pmin >= Pmax', 'Generator index {0}'.format(gen_idx), Pmin[gen_idx])
 
-            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
-            delta[gen_idx] = solver.NumVar(0, ul, name + '_delta')
-            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
-            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
+            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], 'G↑{}'.format(gen_idx))
 
-            solver.Add(delta[gen_idx] == generation[gen_idx] - Pgen[gen_idx])  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Delta_up_gen{}'.format(gen_idx))
+            delta[gen_idx] = solver.NumVar(0, inf, 'Δ↑{}'.format(gen_idx))
+
+            solver.Add(generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx],
+                       'G↑{}_assignment'.format(gen_idx))
 
             dgen1.append(delta[gen_idx])
 
@@ -273,22 +267,16 @@ def formulate_optimal_generation(solver: pywraplp.Solver,
     for bus_idx, gen_idx in gens2:
 
         if generator_active[gen_idx] and dispatchable[gen_idx]:
-            name = 'Gen_down_{0}@bus{1}_{2}'.format(gen_idx, bus_idx, generator_names[gen_idx])
-            ll = -Pgen[gen_idx]
-
-            if ll > 0:
-                logger.add_error('-Pgen > 0 in a regulation down generator', 'Generator index {0}'.format(gen_idx), ll)
 
             if Pmin[gen_idx] >= Pmax[gen_idx]:
                 logger.add_error('Pmin >= Pmax', 'Generator index {0}'.format(gen_idx), Pmin[gen_idx])
 
-            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
-            delta[gen_idx] = solver.NumVar(ll, 0, name + '_delta')
+            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], 'G↓{}'.format(gen_idx))
 
-            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
-            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
+            delta[gen_idx] = solver.NumVar(0, inf, 'Δ↓{}'.format(gen_idx))
 
-            solver.Add(delta[gen_idx] == generation[gen_idx] - Pgen[gen_idx])  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Delta_down_gen{}'.format(gen_idx))
+            solver.Add(generation[gen_idx] == Pgen[gen_idx] - delta[gen_idx],
+                       'G↓{}_assignment'.format(gen_idx))
 
             dgen2.append(delta[gen_idx])
 
@@ -305,9 +293,9 @@ def formulate_optimal_generation(solver: pywraplp.Solver,
         if generator_active[gen_idx]:
             generation[gen_idx] = Pgen[gen_idx]
 
-    power_shift = solver.NumVar(0, inf, 'Area_slack')
-    solver.Add(solver.Sum(dgen1) == power_shift, 'Area equality_1')
-    solver.Add(solver.Sum(dgen2) == - power_shift, 'Area equality_2')
+    power_shift = solver.NumVar(1e-3, inf, 'Area_slack')
+    solver.Add(power_shift == solver.Sum(dgen1), 'Power_shift_assignment')
+    solver.Add(solver.Sum(dgen1) == solver.Sum(dgen2), 'Area equality')
 
     return generation, delta, gen_a1_idx, gen_a2_idx, power_shift, dgen1, gen_cost, delta_slack_1, delta_slack_2
 
@@ -335,7 +323,7 @@ def check_optimal_generation(generator_active, generator_names, dispatchable, Cg
 
     for bus_idx, gen_idx in gens1:
         if generator_active[gen_idx] and dispatchable[gen_idx]:
-            res = delta[gen_idx] == generation[gen_idx] - Pgen[gen_idx]  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx]
+            res = generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx]  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx]
             dgen1.append(delta[gen_idx])
 
             if not res:
@@ -343,7 +331,7 @@ def check_optimal_generation(generator_active, generator_names, dispatchable, Cg
 
     for bus_idx, gen_idx in gens2:
         if generator_active[gen_idx] and dispatchable[gen_idx]:
-            res = delta[gen_idx] == generation[gen_idx] - Pgen[gen_idx]  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Delta_down_gen{}'.format(gen_idx))
+            res = generation[gen_idx] == Pgen[gen_idx] - delta[gen_idx]  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Delta_down_gen{}'.format(gen_idx))
             dgen2.append(delta[gen_idx])
 
             if not res:
@@ -352,7 +340,7 @@ def check_optimal_generation(generator_active, generator_names, dispatchable, Cg
     # check area equality
     sum_a1 = sum(dgen1)
     sum_a2 = sum(dgen2)
-    res = sum_a1 == -sum_a2
+    res = sum_a1 == sum_a2
 
     if not res:
         logger.add_divergence('Area equality not met', 'grid', sum_a1, sum_a2)
@@ -380,7 +368,6 @@ def formulate_proportional_generation(solver: pywraplp.Solver,
     :param a1:
     :param a2:
     :param t:
-    :param add_slacks:
     :return:
     """
     gens1, gens2, gens_out = get_generators_connectivity(Cgen, a1, a2)
@@ -412,25 +399,28 @@ def formulate_proportional_generation(solver: pywraplp.Solver,
         if generator_active[gen_idx] and generator_dispatchable[gen_idx] and Pgen[gen_idx] > 0:
             sum_gen_2 += Pgen[gen_idx]
 
-    power_shift = solver.NumVar(0, inf, 'Area_slack')
+    power_shift = solver.NumVar(1e-3, inf, 'Power_shift')
 
     for bus_idx, gen_idx in gens1:
 
         if generator_active[gen_idx] and generator_dispatchable[gen_idx] and Pgen[gen_idx] > 0:
 
-            name = 'Gen_up_{0}@bus{1}_{2}'.format(gen_idx, bus_idx, generator_names[gen_idx])
+            name = generator_names[gen_idx]
 
             if Pmin[gen_idx] >= Pmax[gen_idx]:
                 logger.add_error('Pmin >= Pmax', 'Generator index {0}'.format(gen_idx), Pmin[gen_idx])
 
-            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
-            delta[gen_idx] = solver.NumVar(0, inf, name + '_delta')
-            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, 'Delta_slack_up_' + name)
-            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, 'Delta_slack_down_' + name)
-            prop = abs(Pgen[gen_idx] / sum_gen_1)
-            solver.Add(delta[gen_idx] == prop * power_shift, 'Delta_equal_to_proportional_power_shift_' + name)
+            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], 'G{}↑'.format(gen_idx))
 
-            solver.Add(generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx]) # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Generation_due_to_forced_delta_' + name)
+            delta[gen_idx] = solver.NumVar(0, inf, 'Δ{}↑'.format(gen_idx))
+
+            prop = round(abs(Pgen[gen_idx] / sum_gen_1), 6)
+
+            solver.Add(delta[gen_idx] == prop * power_shift,
+                       'Δ{0}↑_assignment'.format(gen_idx))
+
+            solver.Add(generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx],
+                       'G{0}↑_assignment'.format(gen_idx))
 
         else:
             generation[gen_idx] = Pgen[gen_idx]
@@ -445,20 +435,23 @@ def formulate_proportional_generation(solver: pywraplp.Solver,
 
         if generator_active[gen_idx] and generator_dispatchable[gen_idx] and Pgen[gen_idx] > 0:
 
-            name = 'Gen_down_{0}@bus{1}_{2}'.format(gen_idx, bus_idx, generator_names[gen_idx])
+            name = generator_names[gen_idx]
 
             if Pmin[gen_idx] >= Pmax[gen_idx]:
                 logger.add_error('Pmin >= Pmax', 'Generator index {0}'.format(gen_idx), Pmin[gen_idx])
 
-            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
-            delta[gen_idx] = solver.NumVar(-Pgen[gen_idx], 0, name + '_delta')
-            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
-            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
+            generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx],
+                                                'G{}↓'.format(gen_idx))
+            delta[gen_idx] = solver.NumVar(0, inf,
+                                           'Δ{}↓'.format(gen_idx, name))
 
-            prop = abs(Pgen[gen_idx] / sum_gen_2)
-            solver.Add(delta[gen_idx] == - prop * power_shift, 'Delta_down_gen{}'.format(gen_idx))
+            prop = round(abs(Pgen[gen_idx] / sum_gen_2), 6)
 
-            solver.Add(generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx]) # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Gen_down_gen{}'.format(gen_idx))
+            solver.Add(delta[gen_idx] == prop * power_shift,
+                       'Δ{0}↓_assignment'.format(gen_idx, name))
+
+            solver.Add(generation[gen_idx] == Pgen[gen_idx] - delta[gen_idx],
+                       'G{}↓_assignment'.format(gen_idx))
 
         else:
             generation[gen_idx] = Pgen[gen_idx]
@@ -474,11 +467,7 @@ def formulate_proportional_generation(solver: pywraplp.Solver,
         if generator_active[gen_idx]:
             generation[gen_idx] = Pgen[gen_idx]
 
-    solver.Add(power_shift == solver.Sum(dgen1), 'Strict area equality_1')
-    solver.Add(solver.Sum(dgen2) == - power_shift, 'Strict area equality_2')
-
-    # solver.Add(solver.Sum(dgen1) >= 0, 'Generation in the area 1 > 0')
-    # solver.Add(solver.Sum(dgen2) <= 0, 'Generation in the area 2 < 0')
+    # NO NEED FOR AREA EQUALITY ENFORCEMENT, IT IN INHERENT TO THIS MODE
 
     return generation, delta, gen_a1_idx, gen_a2_idx, power_shift, dgen1, gen_cost, delta_slack_1, delta_slack_2
 
@@ -528,7 +517,7 @@ def check_proportional_generation(generator_active, dispatchable, generator_cost
 
         if generator_active[gen_idx] and dispatchable[gen_idx] and Pgen[gen_idx] > 0:
 
-            prop = abs(Pgen[gen_idx] / sum_gen_1)
+            prop = round(abs(Pgen[gen_idx] / sum_gen_1), 6)
             res = delta[gen_idx] == prop * power_shift
             if not res:
                 logger.add_divergence("Delta up equal to it's share of the power shift "
@@ -547,14 +536,14 @@ def check_proportional_generation(generator_active, dispatchable, generator_cost
 
         if generator_active[gen_idx] and dispatchable[gen_idx] and Pgen[gen_idx] > 0:
 
-            prop = abs(Pgen[gen_idx] / sum_gen_2)
-            res = delta[gen_idx] == -prop * power_shift
+            prop = round(abs(Pgen[gen_idx] / sum_gen_2), 6)
+            res = delta[gen_idx] == prop * power_shift
             if not res:
                 logger.add_divergence("Delta down equal to it's share of the power shift "
                                       "(delta[i] == -prop * power_shift)",
                                       generator_names[gen_idx], delta[gen_idx], -prop * power_shift)
 
-            res = generation[gen_idx] == Pgen[gen_idx] + delta[gen_idx]
+            res = generation[gen_idx] == Pgen[gen_idx] - delta[gen_idx]
             if not res:
                 logger.add_divergence('Delta down condition not met '
                                       '(generation[i] == Pgen[i] + delta[i])',
@@ -565,14 +554,14 @@ def check_proportional_generation(generator_active, dispatchable, generator_cost
     # check area equality
     sum_a1 = sum(dgen1)
     sum_a2 = sum(dgen2)
-    res = sum_a1 == - sum_a2
+    res = sum_a1 == sum_a2
 
     if not res:
-        logger.add_divergence('Area equality not met', 'grid', sum_a1, - sum_a2)
+        logger.add_divergence('Area equality not met', 'grid', sum_a1, sum_a2)
 
 
 def formulate_angles(solver: pywraplp.Solver, nbus, vd, bus_names, angle_min, angle_max, logger: Logger,
-                     set_ref_to_zero=True):
+                     set_ref_to_zero=False):
     """
 
     :param solver:
@@ -594,11 +583,11 @@ def formulate_angles(solver: pywraplp.Solver, nbus, vd, bus_names, angle_min, an
 
         theta[i] = solver.NumVar(angle_min[i],
                                  angle_max[i],
-                                 'theta_{0}_{1}'.format(i, bus_names[i]))
+                                 'θ{0}'.format(i))
 
     if set_ref_to_zero:
         for i in vd:
-            solver.Add(theta[i] == 0, "reference_bus_angle_zero_{0}_{1}".format(i, bus_names[i]))
+            solver.Add(theta[i] == 0, "θ{0}_ref_zero".format(i))
 
     return theta
 
@@ -716,8 +705,26 @@ def formulate_branches_flow(solver: pywraplp.Solver, nbr, Rates, Sbase,
             _f = F[m]
             _t = T[m]
 
-            # declare the flow variable with ample limits
-            flow_f[m] = solver.NumVar(-inf, inf, 'pftk_{0}_{1}'.format(m, branch_names[m]))
+            # determine the monitoring logic
+            if monitor_only_sensitive_branches:
+                if monitor_loading[m] and alpha_abs[m] > branch_sensitivity_threshold:
+                    monitor[m] = True
+                else:
+                    monitor[m] = False
+            else:
+                monitor[m] = monitor_loading[m]
+
+            if monitor[m]:
+
+                if rates[m] <= 0:
+                    logger.add_error('Rate = 0', 'Branch:{0}'.format(m) + ';' + branch_names[m], rates[m])
+
+                # declare the flow variable with strict limits
+                flow_f[m] = solver.NumVar(-rates[m], rates[m], 'flow_{0}_{1}'.format(m, branch_names[m]))
+
+            else:
+                # declare the flow variable with ample limits
+                flow_f[m] = solver.NumVar(-inf, inf, 'flow_{0}_{1}'.format(m, branch_names[m]))
 
             # compute the branch susceptance
             if branch_dc[m]:
@@ -733,33 +740,11 @@ def formulate_branches_flow(solver: pywraplp.Solver, nbr, Rates, Sbase,
                                        'phase_shift_{0}_{1}'.format(m, branch_names[m]))
                 # branch power from-to eq.15
                 solver.Add(flow_f[m] == bk * (angles[_f] - angles[_t] + tau[m]),
-                           'phase_shifter_power_flow_{0}_{1}'.format(m, branch_names[m]))
+                           'set_phase_shifter_flow_{0}_{1}'.format(m, branch_names[m]))
             else:
                 # branch power from-to eq.15
                 solver.Add(flow_f[m] == bk * (angles[_f] - angles[_t]),
-                           'branch_power_flow_{0}_{1}'.format(m, branch_names[m]))
-
-            # determine the monitoring logic
-            if monitor_only_sensitive_branches:
-                if monitor_loading[m] and alpha_abs[m] > branch_sensitivity_threshold:
-                    monitor[m] = True
-                else:
-                    monitor[m] = False
-            else:
-                monitor[m] = monitor_loading[m]
-
-            if monitor[m]:
-
-                if rates[m] <= 0:
-                    logger.add_error('Rate = 0', 'Branch:{0}'.format(m) + ';' + branch_names[m], rates[m])
-
-                # rating restriction in the sense from-to: eq.17
-                # overload1[m] = solver.NumVar(0, inf, 'overload1_{0}_{1}'.format(m, branch_names[m]))
-                solver.Add(flow_f[m] <= rates[m], "ft_rating_{0}_{1}".format(m, branch_names[m]))
-
-                # rating restriction in the sense to-from: eq.18
-                # overload2[m] = solver.NumVar(0, inf, 'overload2_{0}_{1}'.format(m, branch_names[m]))
-                solver.Add(flow_f[m] >= -rates[m], "tf_rating_{0}_{1}".format(m, branch_names[m]))
+                           'set_flow_{0}_{1}'.format(m, branch_names[m]))
 
     return flow_f, overload1, overload2, tau, monitor
 
@@ -889,24 +874,17 @@ def formulate_contingency(solver: pywraplp.Solver, ContingencyRates, Sbase,
         for c in con_br_idx:  # for every contingency
 
             if m != c and LODF[m, c] > branch_sensitivity_threshold:
-                # compute the N-1 flow
-                flow_n1 = flow_f[m] + LODF[m, c] * flow_f[c]
-
                 suffix = "{0}_{1} @ {2}_{3}".format(m, branch_names[m], c, branch_names[c])
 
-                # rating restriction in the sense from-to
-                overload1 = solver.NumVar(0, inf, 'n-1_overload1__' + suffix)
-                solver.Add(flow_n1 <= rates[m], "n-1_ft_rating_" + suffix)
+                # define the flow
+                flow_n1 = solver.NumVar(-rates[m], rates[m], 'n-1_flow_' + suffix)
 
-                # rating restriction in the sense to-from
-                overload2 = solver.NumVar(0, inf, 'n-1_overload2_' + suffix)
-                solver.Add(flow_n1 >= -rates[m], "n-1_tf_rating_" + suffix)
+                # compute the N-1 flow
+                solver.Add(flow_n1 == flow_f[m] + LODF[m, c] * flow_f[c], "n-1_flow_assign_" + suffix)
 
                 # store vars
                 con_idx.append((m, c))
                 flow_n1f.append(flow_n1)
-                overloads1.append(overload1)
-                overloads2.append(overload2)
 
     return flow_n1f, overloads1, overloads2, con_idx
 
@@ -1163,10 +1141,6 @@ def formulate_objective(solver: pywraplp.Solver,
     for i, (k, sign) in enumerate(inter_area_hvdc):
         flows_hvdc_ft[i] = sign * hvdc_flow_f[k]
 
-    flow_from_a1_to_a2 = solver.Sum(flows_ft) + solver.Sum(flows_hvdc_ft)
-
-    # summation of generation deltas in the area 1 (this should be positive)
-    area_1_gen_delta = solver.Sum(dgen1)
 
     # include the cost of generation
     gen_cost_f = solver.Sum(gen_cost * generation_delta)
@@ -1182,16 +1156,11 @@ def formulate_objective(solver: pywraplp.Solver,
     delta_slacks = solver.Sum(delta_slack_1) + solver.Sum(delta_slack_2)
 
     # formulate objective function
-    # f = 0
-    f = - weight_power_shift * area_1_gen_delta
-    f -= weight_power_shift * power_shift
+    # maximize these
+    f = - weight_power_shift * power_shift
 
-    if maximize_exchange_flows:
-        f -= weight_power_shift * flow_from_a1_to_a2
-    else:
-        print('Skipping the exchange branch flows maximization')
-
-    f += weight_generation_cost * gen_cost_f
+    # minimize these
+    # f += weight_generation_cost * gen_cost_f
     f += weight_generation_delta * delta_slacks
     f += weight_overloads * branch_overload
     f += weight_overloads * contingency_branch_overload
@@ -1734,7 +1703,7 @@ class OpfNTC(Opf):
             lp_content = self.solver.ExportModelAsMpsFormat(obfuscated=False, fixed_format=True)
         else:
             raise Exception('Unsupported file format')
-        file2write = open(file_name, 'w')
+        file2write = open(file_name, 'w', encoding='utf-16')
         file2write.write(lp_content)
         file2write.close()
 
@@ -1746,13 +1715,14 @@ class OpfNTC(Opf):
 
             self.status = self.solver.Solve()
 
-            converged = self.converged()
-
             self.save_lp('ntc_opf.lp')
 
             # check the solution
-            if not converged:
+            if self.status not in [pywraplp.Solver.INFEASIBLE]:
+                converged = self.converged()
                 self.check()
+            else:
+                converged = False
 
             return converged
         else:

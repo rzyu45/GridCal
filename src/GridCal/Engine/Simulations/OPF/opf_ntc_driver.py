@@ -540,7 +540,10 @@ class OptimalNetTransferCapacity(DriverTemplate):
         # Solve
         self.progress_text.emit('Solving NTC OPF...')
         converged = problem.solve()
-        err = problem.error()
+        if converged:
+            err = problem.error()
+        else:
+            err = 999999
 
         if not converged:
             self.logger.add_error('Did not converge', 'NTC OPF', str(err), self.options.tolerance)
