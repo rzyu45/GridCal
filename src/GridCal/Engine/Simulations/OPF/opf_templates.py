@@ -72,7 +72,7 @@ class Opf:
                 print('Forced the use of GLOP')
             else:
                 self.solver = pywraplp.Solver.CreateSolver(self.solver_type.value)
-
+            self.solver.EnableOutput()
         else:
             self.solver = solver_type
 

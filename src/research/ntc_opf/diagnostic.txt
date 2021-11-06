@@ -1,0 +1,154 @@
+CPLEX> read "/home/santi/Documentos/Git/GitHub/GridCal/src/GridCal/ntc_opf.lp"
+Problem '/home/santi/Documentos/Git/GitHub/GridCal/src/GridCal/ntc_opf.lp' read.
+Read time = 0.00 sec. (0.01 ticks)
+CPLEX> tool conflict
+Version identifier: 12.10.0.0 | 2019-11-26 | 843d4de
+
+Minimal conflict:   30 linear constraint(s)
+                     1 lower bound(s)
+                     0 upper bound(s)
+Conflict computation time =    0.01 sec.  Iterations = 1
+Deterministic time = 0.61 ticks  (120.13 ticks/sec)
+CPLEX> display conflict all
+Minimize
+ obj1:
+Subject To
+ Delta_equal_to_proportional_power_shift_Gen_up_3@bus5_gen_6:
+                                 - 0.730754 Area_slack
+                                 + Gen_up_3@bus5_gen_6_delta  = 0
+ auto_c_000000001:               - Gen_up_3@bus5_gen_6_delta
+                                 + Gen_up_3@bus5_gen_6  = 0.592888
+ Delta_equal_to_proportional_power_shift_Gen_up_4@bus7_gen_8:
+                                 - 0.269246 Area_slack
+                                 + Gen_up_4@bus7_gen_8_delta  = 0
+ auto_c_000000003:               - Gen_up_4@bus7_gen_8_delta
+                                 + Gen_up_4@bus7_gen_8  = 0.218449
+ Delta_down_gen0:                0.333333 Area_slack
+                                 + Gen_down_0@bus0_gen_1_delta  = 0
+ auto_c_000000005:               - Gen_down_0@bus0_gen_1_delta
+                                 + Gen_down_0@bus0_gen_1  = 0.592888
+ Delta_down_gen1:                0.333333 Area_slack
+                                 + Gen_down_1@bus1_gen_2_delta  = 0
+ auto_c_000000007:               - Gen_down_1@bus1_gen_2_delta
+                                 + Gen_down_1@bus1_gen_2  = 0.592888
+ Delta_down_gen2:                0.333333 Area_slack
+                                 + Gen_down_2@bus2_gen_3_delta  = 0
+ auto_c_000000009:               - Gen_down_2@bus2_gen_3_delta
+                                 + Gen_down_2@bus2_gen_3  = 0.592888
+ reference_bus_angle_zero_0_Bus_1_____HV: theta_0_Bus_1_____HV  = 0
+ branch_power_flow_9_Line_10:    1000 theta_3_Bus_4_____HV
+                                 - 1000 theta_15_Bus_15_HV + pftk_9_Line_10
+                                  = 0
+ branch_power_flow_19_branch_14: 9.09008 theta_8_Bus_9_____LV
+                                 - 9.09008 theta_6_Bus_7_____ZV
+                                 + pftk_19_branch_14  = 0
+ n_1_ft_rating_9_Line_10_@_19_branch_14: pftk_9_Line_10 + pftk_19_branch_14
+                                 <= 0.2
+ hvdc_power_flow_0_HVDC_Line:    hvdc_flow_0_HVDC_Line
+                                 - 208.333 theta_10_Bus_11____LV
+                                 + 208.333 theta_14_Bus_14_HV  = 0.05
+ Node_power_balance_0_Bus_1_____HV: - Gen_down_0@bus0_gen_1
+                                 + 21.384 theta_0_Bus_1_____HV
+                                 - 4.4835 theta_4_Bus_5_____HV
+                                 - 16.9005 theta_1_Bus_2_____HV  = 0
+ Node_power_balance_1_Bus_2_____HV: - Gen_down_1@bus1_gen_2
+                                 - 16.9005 theta_0_Bus_1_____HV
+                                 - 5.67151 theta_3_Bus_4_____HV
+                                 - 5.75109 theta_4_Bus_5_____HV
+                                 + 33.3743 theta_1_Bus_2_____HV
+                                 - 5.05127 theta_2_Bus_3_____HV  = -0.217
+ Node_power_balance_2_Bus_3_____HV: - Gen_down_2@bus2_gen_3
+                                 - 5.84693 theta_3_Bus_4_____HV
+                                 - 5.05127 theta_1_Bus_2_____HV
+                                 + 10.8982 theta_2_Bus_3_____HV  = -0.942
+ Node_power_balance_3_Bus_4_____HV: 1037.12 theta_3_Bus_4_____HV
+                                 - 23.7473 theta_4_Bus_5_____HV
+                                 - 1.8555 theta_8_Bus_9_____LV
+                                 - 1000 theta_15_Bus_15_HV
+                                 - 5.67151 theta_1_Bus_2_____HV
+                                 - 5.84693 theta_2_Bus_3_____HV  = -0.478
+ Node_power_balance_4_Bus_5_____HV: - 4.4835 theta_0_Bus_1_____HV
+                                 - 23.7473 theta_3_Bus_4_____HV
+                                 + 238.239 theta_4_Bus_5_____HV
+                                 - 4.25745 theta_5_Bus_6_____LV
+                                 - 5.75109 theta_1_Bus_2_____HV
+                                 - 200 theta_14_Bus_14_HV  = -0.076
+ Node_power_balance_5_Bus_6_____LV: - Gen_up_3@bus5_gen_6
+                                 - 4.25745 theta_4_Bus_5_____HV
+                                 + 20.8706 theta_5_Bus_6_____LV
+                                 - 5.02765 theta_10_Bus_11____LV
+                                 - 3.90915 theta_11_Bus_12____LV
+                                 - 7.67636 theta_12_Bus_13____LV  = -0.112
+ Node_power_balance_6_Bus_7_____ZV: - 9.09008 theta_8_Bus_9_____LV
+                                 - 4.78194 theta_15_Bus_15_HV
+                                 + 19.549 theta_6_Bus_7_____ZV
+                                 - 5.67698 theta_7_Bus_8_____TV  = 0
+ Node_power_balance_7_Bus_8_____TV: - Gen_up_4@bus7_gen_8
+                                 - 5.67698 theta_6_Bus_7_____ZV
+                                 + 5.67698 theta_7_Bus_8_____TV  = 0
+ Node_power_balance_8_Bus_9_____LV: - 1.8555 theta_3_Bus_4_____HV
+                                 + 26.4784 theta_8_Bus_9_____LV
+                                 - 11.8343 theta_9_Bus_10____LV
+                                 - 3.6985 theta_13_Bus_14____LV
+                                 - 9.09008 theta_6_Bus_7_____ZV  = -0.295
+ Node_power_balance_9_Bus_10____LV: - 5.20644 theta_10_Bus_11____LV
+                                 - 11.8343 theta_8_Bus_9_____LV
+                                 + 17.0408 theta_9_Bus_10____LV  = -0.09
+ Node_power_balance_11_Bus_12____LV: - 3.90915 theta_5_Bus_6_____LV
+                                 + 8.91215 theta_11_Bus_12____LV
+                                 - 5.003 theta_12_Bus_13____LV  = -0.061
+ Node_power_balance_12_Bus_13____LV: - 7.67636 theta_5_Bus_6_____LV
+                                 - 5.003 theta_11_Bus_12____LV
+                                 + 15.5528 theta_12_Bus_13____LV
+                                 - 2.8734 theta_13_Bus_14____LV  = -0.135
+ Node_power_balance_13_Bus_14____LV: - 2.8734 theta_12_Bus_13____LV
+                                 - 3.6985 theta_8_Bus_9_____LV
+                                 + 6.5719 theta_13_Bus_14____LV  = -0.149
+ Node_power_balance_14_Bus_14_HV: - hvdc_flow_0_HVDC_Line
+                                 - 200 theta_4_Bus_5_____HV
+                                 + 200 theta_14_Bus_14_HV  = 0
+ Node_power_balance_15_Bus_15_HV: - 1000 theta_3_Bus_4_____HV
+                                 + 1004.78 theta_15_Bus_15_HV
+                                 - 4.78194 theta_6_Bus_7_____ZV  = 0
+\Sum of equality rows in the conflict:
+\ sum_eq: - 0.00000100000000002876 Area_slack + theta_0_Bus_1_____HV
+\         + 999.99876 theta_3_Bus_4_____HV
+\         - 0.000339999999994234 theta_4_Bus_5_____HV
+\         + 5.02764 theta_5_Bus_6_____LV - 218.56709 theta_10_Bus_11____LV
+\         + 0.000040000000000262 theta_12_Bus_13____LV
+\         + 9.0901 theta_8_Bus_9_____LV + 5.2065 theta_9_Bus_10____LV
+\         - 1000.00194 theta_15_Bus_15_HV + pftk_9_Line_10
+\         - 0.0000700000000009027 theta_1_Bus_2_____HV
+\         - 9.09008 theta_6_Bus_7_____ZV + pftk_19_branch_14
+\         + 208.333 theta_14_Bus_14_HV  = 0.0850009999999995
+Bounds
+      Gen_up_3@bus5_gen_6_delta Free
+      Gen_up_4@bus7_gen_8_delta Free
+      hvdc_flow_0_HVDC_Line Free
+      Gen_up_3@bus5_gen_6 Free
+      Gen_up_4@bus7_gen_8 Free
+      Gen_down_0@bus0_gen_1_delta Free
+      Gen_down_0@bus0_gen_1 Free
+      Gen_down_1@bus1_gen_2_delta Free
+      Gen_down_1@bus1_gen_2 Free
+      Gen_down_2@bus2_gen_3_delta Free
+      Gen_down_2@bus2_gen_3 Free
+      theta_0_Bus_1_____HV Free
+      theta_3_Bus_4_____HV Free
+      theta_4_Bus_5_____HV Free
+      theta_5_Bus_6_____LV Free
+      theta_10_Bus_11____LV Free
+      theta_11_Bus_12____LV Free
+      theta_12_Bus_13____LV Free
+      theta_8_Bus_9_____LV Free
+      theta_9_Bus_10____LV Free
+      theta_13_Bus_14____LV Free
+      theta_15_Bus_15_HV Free
+      pftk_9_Line_10 Free
+      theta_1_Bus_2_____HV Free
+      theta_2_Bus_3_____HV Free
+      theta_6_Bus_7_____ZV Free
+      theta_7_Bus_8_____TV Free
+      pftk_19_branch_14 Free
+      theta_14_Bus_14_HV Free
+ All other variables are >= 0.

@@ -255,8 +255,8 @@ def formulate_optimal_generation(solver: pywraplp.Solver,
 
             generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
             delta[gen_idx] = solver.NumVar(0, ul, name + '_delta')
-            delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
-            delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
+            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
+            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
 
             solver.Add(delta[gen_idx] == generation[gen_idx] - Pgen[gen_idx])  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Delta_up_gen{}'.format(gen_idx))
 
@@ -285,8 +285,8 @@ def formulate_optimal_generation(solver: pywraplp.Solver,
             generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
             delta[gen_idx] = solver.NumVar(ll, 0, name + '_delta')
 
-            delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
-            delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
+            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
+            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
 
             solver.Add(delta[gen_idx] == generation[gen_idx] - Pgen[gen_idx])  # + delta_slack_1[gen_idx] - delta_slack_2[gen_idx], 'Delta_down_gen{}'.format(gen_idx))
 
@@ -425,8 +425,8 @@ def formulate_proportional_generation(solver: pywraplp.Solver,
 
             generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
             delta[gen_idx] = solver.NumVar(0, inf, name + '_delta')
-            delta_slack_1[gen_idx] = solver.NumVar(0, inf, 'Delta_slack_up_' + name)
-            delta_slack_2[gen_idx] = solver.NumVar(0, inf, 'Delta_slack_down_' + name)
+            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, 'Delta_slack_up_' + name)
+            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, 'Delta_slack_down_' + name)
             prop = abs(Pgen[gen_idx] / sum_gen_1)
             solver.Add(delta[gen_idx] == prop * power_shift, 'Delta_equal_to_proportional_power_shift_' + name)
 
@@ -452,8 +452,8 @@ def formulate_proportional_generation(solver: pywraplp.Solver,
 
             generation[gen_idx] = solver.NumVar(Pmin[gen_idx], Pmax[gen_idx], name)
             delta[gen_idx] = solver.NumVar(-Pgen[gen_idx], 0, name + '_delta')
-            delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
-            delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
+            # delta_slack_1[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_up')
+            # delta_slack_2[gen_idx] = solver.NumVar(0, inf, name + '_delta_slack_down')
 
             prop = abs(Pgen[gen_idx] / sum_gen_2)
             solver.Add(delta[gen_idx] == - prop * power_shift, 'Delta_down_gen{}'.format(gen_idx))
@@ -474,7 +474,7 @@ def formulate_proportional_generation(solver: pywraplp.Solver,
         if generator_active[gen_idx]:
             generation[gen_idx] = Pgen[gen_idx]
 
-    solver.Add(solver.Sum(dgen1) == power_shift, 'Strict area equality_1')
+    solver.Add(power_shift == solver.Sum(dgen1), 'Strict area equality_1')
     solver.Add(solver.Sum(dgen2) == - power_shift, 'Strict area equality_2')
 
     # solver.Add(solver.Sum(dgen1) >= 0, 'Generation in the area 1 > 0')
@@ -614,7 +614,7 @@ def formulate_power_injections(load_injections_per_bus, Cgen, generation, Sbase,
     gen_injections = lpExpand(Cgen, generation)
     load_fixed_injections = load_injections_per_bus[:, t].real / Sbase  # with sign already
 
-    return gen_injections + load_fixed_injections
+    return gen_injections + np.round(load_fixed_injections, 8)
 
 
 def formulate_node_balance(solver: pywraplp.Solver, nbus, Bbus, angles, Pinj, bus_active, bus_names):
@@ -629,6 +629,7 @@ def formulate_node_balance(solver: pywraplp.Solver, nbus, Bbus, angles, Pinj, bu
     :param bus_names:
     :return:
     """
+    Bbus.data = np.round(Bbus.data, 8)
     node_balance = lpDot(Bbus, angles)
 
     # equal the balance to the generation: eq.13,14 (equality)
@@ -724,6 +725,8 @@ def formulate_branches_flow(solver: pywraplp.Solver, nbr, Rates, Sbase,
             else:
                 bk = 1.0 / X[m]
 
+            bk = round(bk, 8)
+
             if control_mode[m] == TransformerControlType.Pt:  # is a phase shifter
                 # create the phase shift variable
                 tau[m] = solver.NumVar(theta_min[m], theta_max[m],
@@ -751,12 +754,12 @@ def formulate_branches_flow(solver: pywraplp.Solver, nbr, Rates, Sbase,
                     logger.add_error('Rate = 0', 'Branch:{0}'.format(m) + ';' + branch_names[m], rates[m])
 
                 # rating restriction in the sense from-to: eq.17
-                overload1[m] = solver.NumVar(0, inf, 'overload1_{0}_{1}'.format(m, branch_names[m]))
-                solver.Add(flow_f[m] <= (rates[m]), "ft_rating_{0}_{1}".format(m, branch_names[m]))
+                # overload1[m] = solver.NumVar(0, inf, 'overload1_{0}_{1}'.format(m, branch_names[m]))
+                solver.Add(flow_f[m] <= rates[m], "ft_rating_{0}_{1}".format(m, branch_names[m]))
 
                 # rating restriction in the sense to-from: eq.18
-                overload2[m] = solver.NumVar(0, inf, 'overload2_{0}_{1}'.format(m, branch_names[m]))
-                solver.Add((-rates[m]) <= flow_f[m], "tf_rating_{0}_{1}".format(m, branch_names[m]))
+                # overload2[m] = solver.NumVar(0, inf, 'overload2_{0}_{1}'.format(m, branch_names[m]))
+                solver.Add(flow_f[m] >= -rates[m], "tf_rating_{0}_{1}".format(m, branch_names[m]))
 
     return flow_f, overload1, overload2, tau, monitor
 
@@ -893,11 +896,11 @@ def formulate_contingency(solver: pywraplp.Solver, ContingencyRates, Sbase,
 
                 # rating restriction in the sense from-to
                 overload1 = solver.NumVar(0, inf, 'n-1_overload1__' + suffix)
-                solver.Add(flow_n1 <= (rates[m]), "n-1_ft_rating_" + suffix)
+                solver.Add(flow_n1 <= rates[m], "n-1_ft_rating_" + suffix)
 
                 # rating restriction in the sense to-from
                 overload2 = solver.NumVar(0, inf, 'n-1_overload2_' + suffix)
-                solver.Add((-rates[m]) <= flow_n1, "n-1_tf_rating_" + suffix)
+                solver.Add(flow_n1 >= -rates[m], "n-1_tf_rating_" + suffix)
 
                 # store vars
                 con_idx.append((m, c))
@@ -1021,12 +1024,12 @@ def formulate_hvdc_flow(solver: pywraplp.Solver, nhvdc, names,
                 Pinj[_t] += flow_f[i]
 
                 # rating restriction in the sense from-to: eq.17
-                overload1[i] = solver.NumVar(0, inf, 'overload_hvdc1_' + suffix)
-                solver.Add(flow_f[i] <= (rates[i] + overload1[i]), "hvdc_ft_rating_" + suffix)
+                # overload1[i] = solver.NumVar(0, inf, 'overload_hvdc1_' + suffix)
+                solver.Add(flow_f[i] <= rates[i], "hvdc_ft_rating_" + suffix)
 
                 # rating restriction in the sense to-from: eq.18
-                overload2[i] = solver.NumVar(0, inf, 'overload_hvdc2_' + suffix)
-                solver.Add((-rates[i] - overload2[i]) <= flow_f[i], "hvdc_tf_rating_" + suffix)
+                # overload2[i] = solver.NumVar(0, inf, 'overload_hvdc2_' + suffix)
+                solver.Add(flow_f[i] >= -rates[i], "hvdc_tf_rating_" + suffix)
 
             elif control_mode[i] == HvdcControlType.type_1_Pset and not dispatchable[i]:
                 # simple injections model: The power is set by the user
