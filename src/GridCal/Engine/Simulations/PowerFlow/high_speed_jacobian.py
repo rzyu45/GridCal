@@ -469,14 +469,15 @@ def fill_derivatives(Yx, Yp, Yi, V, E, dS_dVm, dS_dVa):
             # row index
             i = Yi[k]
 
+            # Ybus * diag(V)
+            dS_dVa[k] = Yx[k] * V[j]  # Yx[k] -> Y(i,j)
+
             # Ibus = Ybus * V
-            Ibus[i] += Yx[k] * V[j]  # Yx[k] -> Y(i,j)
+            # Ibus[i] += Yx[k] * V[j]
+            Ibus[i] += dS_dVa[k]
 
             # Ybus * diagE
             dS_dVm[k] = Yx[k] * E[j]
-
-            # Ybus * diag(V)
-            dS_dVa[k] = Yx[k] * V[j]
 
     # pass 2: finalize the operations
     for j in range(n):  # for each column ...

@@ -23,11 +23,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="903393a6-e011-4cf7-964c-90325cdcb845" name="Default Changelist" comment="added 3-node state estimation test">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/ContinuationPowerFlow/continuation_power_flow.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/ContinuationPowerFlow/continuation_power_flow.py" afterDir="false" />
+    <list default="true" id="903393a6-e011-4cf7-964c-90325cdcb845" name="Default Changelist" comment="Implemented Jacobian as a class to keep the states (not worth it so far)">
       <change beforePath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/high_speed_jacobian.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/high_speed_jacobian.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -640,13 +637,6 @@
       <workItem from="1635497084181" duration="1985000" />
       <workItem from="1635594361899" duration="4928000" />
     </task>
-    <task id="LOCAL-00159" summary="GUI session now handles all the threading">
-      <created>1626445169505</created>
-      <option name="number" value="00159" />
-      <option name="presentableId" value="LOCAL-00159" />
-      <option name="project" value="LOCAL" />
-      <updated>1626445169505</updated>
-    </task>
     <task id="LOCAL-00160" summary="Further remove PySide2">
       <created>1626446594123</created>
       <option name="number" value="00160" />
@@ -983,7 +973,14 @@
       <option name="project" value="LOCAL" />
       <updated>1635596774407</updated>
     </task>
-    <option name="localTasksCounter" value="208" />
+    <task id="LOCAL-00208" summary="Implemented Jacobian as a class to keep the states (not worth it so far)">
+      <created>1636563441786</created>
+      <option name="number" value="00208" />
+      <option name="presentableId" value="LOCAL-00208" />
+      <option name="project" value="LOCAL" />
+      <updated>1636563441786</updated>
+    </task>
+    <option name="localTasksCounter" value="209" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1017,7 +1014,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improved voltage formation" />
     <MESSAGE value="Added the ability to select branches for contingency&#10;ATC (snapshot) taked into account the contingency_enabled property" />
     <MESSAGE value="Fixed minor indexing error&#10;The ATC report generation is more straight forward" />
     <MESSAGE value="Extended the contingency branch selection to the ATC" />
@@ -1042,7 +1038,8 @@
     <MESSAGE value="Fixed synthax errors of the state stimator" />
     <MESSAGE value="Improved PowerWorld's EPC format reader. Now it should support v21 as well" />
     <MESSAGE value="added 3-node state estimation test" />
-    <option name="LAST_COMMIT_MESSAGE" value="added 3-node state estimation test" />
+    <MESSAGE value="Implemented Jacobian as a class to keep the states (not worth it so far)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented Jacobian as a class to keep the states (not worth it so far)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
