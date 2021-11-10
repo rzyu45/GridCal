@@ -23,9 +23,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="903393a6-e011-4cf7-964c-90325cdcb845" name="Default Changelist" comment="Fixed indices in the NTC pre-solve and the linear contingency analysis">
+    <list default="true" id="903393a6-e011-4cf7-964c-90325cdcb845" name="Default Changelist" comment="added 3-node state estimation test">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/OPF/ntc_opf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/OPF/ntc_opf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/ContinuationPowerFlow/continuation_power_flow.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/ContinuationPowerFlow/continuation_power_flow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/high_speed_jacobian.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/high_speed_jacobian.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +55,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="ntc_no_slacks" />
+        <entry key="$PROJECT_DIR$" value="devel" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -102,52 +104,30 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="ToolWindowDatabase.ShowToolbar" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/research/state_estimation" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/research/state_estimation" />
-      <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\GridCal\Gui\Main\icons" />
+      <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\GridCal\Engine\Simulations\PowerFlow" />
       <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\GridCal\Gui\AboutDialogue\icons" />
       <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\GridCal\Gui" />
       <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\GridCal\Gui\Session" />
+      <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\research\jacobian" />
       <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\research" />
       <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\GridCal\Gui\Session" />
       <recent name="C:\Users\SPV86\Documents\Git\GitHub\GridCal\src\GridCal\Gui" />
       <recent name="$PROJECT_DIR$/doc/formats" />
-      <recent name="$PROJECT_DIR$/src/research/power_flow" />
     </key>
   </component>
   <component name="RunManager" selected="Python.ExecuteGridCal">
-    <configuration name="5_bus_se" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="GridCal" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/research/state_estimation" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/research/state_estimation/5_bus_se.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="ExecuteGridCal" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="GridCal" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -170,7 +150,29 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="jacobian_lynn_cartesian" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="defining_a_grid_from_scratch_with_profiles" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="GridCal" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/Tutorials" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/Tutorials/defining_a_grid_from_scratch_with_profiles.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="jacobian_gomez_exposito" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="GridCal" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -183,7 +185,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/research/jacobian/jacobian_lynn_cartesian.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/research/jacobian/jacobian_gomez_exposito.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -192,7 +194,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="setup" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="state_estimation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="GridCal" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -200,13 +202,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/GridCal/Engine/Simulations/StateEstimation" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/setup.py" />
-      <option name="PARAMETERS" value="bdist_wheel" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/GridCal/Engine/Simulations/StateEstimation/state_estimation.py" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -232,18 +234,18 @@
     </configuration>
     <list>
       <item itemvalue="Python.ExecuteGridCal" />
-      <item itemvalue="Python.5_bus_se" />
-      <item itemvalue="Python.setup" />
-      <item itemvalue="Python.jacobian_lynn_cartesian" />
+      <item itemvalue="Python.defining_a_grid_from_scratch_with_profiles" />
+      <item itemvalue="Python.jacobian_gomez_exposito" />
+      <item itemvalue="Python.state_estimation" />
       <item itemvalue="Python tests.Nosetests in test_state_estimation.py" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.ExecuteGridCal" />
-        <item itemvalue="Python.jacobian_lynn_cartesian" />
-        <item itemvalue="Python.setup" />
         <item itemvalue="Python tests.Nosetests in test_state_estimation.py" />
-        <item itemvalue="Python.5_bus_se" />
+        <item itemvalue="Python.state_estimation" />
+        <item itemvalue="Python.defining_a_grid_from_scratch_with_profiles" />
+        <item itemvalue="Python.jacobian_gomez_exposito" />
       </list>
     </recent_temporary>
   </component>
@@ -624,47 +626,222 @@
       <workItem from="1632556392083" duration="2867000" />
       <workItem from="1632724478822" duration="7730000" />
       <workItem from="1632764073720" duration="601000" />
-      <workItem from="1632810180431" duration="14045000" />
-      <workItem from="1632915709734" duration="3229000" />
-      <workItem from="1632933306045" duration="7119000" />
-      <workItem from="1632982464938" duration="12781000" />
-      <workItem from="1633070946995" duration="7840000" />
-      <workItem from="1633101859656" duration="1909000" />
-      <workItem from="1633171343469" duration="619000" />
-      <workItem from="1633720322637" duration="657000" />
-      <workItem from="1633729733367" duration="2031000" />
-      <workItem from="1633767794296" duration="325000" />
-      <workItem from="1633772059194" duration="9102000" />
-      <workItem from="1633787830301" duration="791000" />
-      <workItem from="1633789071270" duration="7694000" />
-      <workItem from="1633855780926" duration="15843000" />
-      <workItem from="1633933119827" duration="11000" />
-      <workItem from="1633942761979" duration="636000" />
-      <workItem from="1633950153160" duration="452000" />
-      <workItem from="1633962674822" duration="468000" />
-      <workItem from="1634037950002" duration="3130000" />
-      <workItem from="1634106599152" duration="23651000" />
-      <workItem from="1634213938353" duration="1133000" />
-      <workItem from="1634223591028" duration="392000" />
-      <workItem from="1634570464002" duration="2370000" />
-      <workItem from="1634649543353" duration="12917000" />
-      <workItem from="1634737011977" duration="1571000" />
-      <workItem from="1634829000406" duration="36000" />
-      <workItem from="1634829216499" duration="168000" />
-      <workItem from="1635706071416" duration="264000" />
-      <workItem from="1635762680652" duration="605000" />
-      <workItem from="1635768046211" duration="3357000" />
-      <workItem from="1635876621310" duration="2732000" />
-      <workItem from="1635948954969" duration="3919000" />
-      <workItem from="1635955126039" duration="28000" />
-      <workItem from="1635957977516" duration="3081000" />
-      <workItem from="1636234599331" duration="2540000" />
-      <workItem from="1636278312764" duration="4677000" />
-      <workItem from="1636356870558" duration="6910000" />
-      <workItem from="1636368471973" duration="6854000" />
-      <workItem from="1636460431342" duration="1353000" />
-      <workItem from="1636482316185" duration="630000" />
-      <workItem from="1636531307098" duration="3424000" />
+      <workItem from="1632810180431" duration="7195000" />
+      <workItem from="1634287523952" duration="1243000" />
+      <workItem from="1634929586139" duration="645000" />
+      <workItem from="1634932591063" duration="1280000" />
+      <workItem from="1635065660542" duration="17499000" />
+      <workItem from="1635142267986" duration="224000" />
+      <workItem from="1635180176102" duration="5001000" />
+      <workItem from="1635228769394" duration="27000" />
+      <workItem from="1635363833769" duration="615000" />
+      <workItem from="1635402396564" duration="6000" />
+      <workItem from="1635427321534" duration="723000" />
+      <workItem from="1635497084181" duration="1985000" />
+      <workItem from="1635594361899" duration="4928000" />
+    </task>
+    <task id="LOCAL-00159" summary="GUI session now handles all the threading">
+      <created>1626445169505</created>
+      <option name="number" value="00159" />
+      <option name="presentableId" value="LOCAL-00159" />
+      <option name="project" value="LOCAL" />
+      <updated>1626445169505</updated>
+    </task>
+    <task id="LOCAL-00160" summary="Further remove PySide2">
+      <created>1626446594123</created>
+      <option name="number" value="00160" />
+      <option name="presentableId" value="LOCAL-00160" />
+      <option name="project" value="LOCAL" />
+      <updated>1626446594123</updated>
+    </task>
+    <task id="LOCAL-00161" summary="Further simplified the passing of results to the schematic for representation">
+      <created>1626448618999</created>
+      <option name="number" value="00161" />
+      <option name="presentableId" value="LOCAL-00161" />
+      <option name="project" value="LOCAL" />
+      <updated>1626448618999</updated>
+    </task>
+    <task id="LOCAL-00162" summary="Moved file drivers to the Session Gui package">
+      <created>1626516195984</created>
+      <option name="number" value="00162" />
+      <option name="presentableId" value="LOCAL-00162" />
+      <option name="project" value="LOCAL" />
+      <updated>1626516195984</updated>
+    </task>
+    <task id="LOCAL-00163" summary="Moved the tower and wire tables from the engine to the GUI tower editor">
+      <created>1626516882401</created>
+      <option name="number" value="00163" />
+      <option name="presentableId" value="LOCAL-00163" />
+      <option name="project" value="LOCAL" />
+      <updated>1626516882401</updated>
+    </task>
+    <task id="LOCAL-00164" summary="Split ResultsModel in ResultsTable and ResultsModel, and now the Engine has zero Qt dependencies">
+      <created>1626552314946</created>
+      <option name="number" value="00164" />
+      <option name="presentableId" value="LOCAL-00164" />
+      <option name="project" value="LOCAL" />
+      <updated>1626552314947</updated>
+    </task>
+    <task id="LOCAL-00165" summary="Added graphviz algorithms as an option">
+      <created>1626556426222</created>
+      <option name="number" value="00165" />
+      <option name="presentableId" value="LOCAL-00165" />
+      <option name="project" value="LOCAL" />
+      <updated>1626556426222</updated>
+    </task>
+    <task id="LOCAL-00166" summary="Fixed Sigma analysis model view. Bug caused by the change to ResultsTable+ResultsModel">
+      <created>1626557274260</created>
+      <option name="number" value="00166" />
+      <option name="presentableId" value="LOCAL-00166" />
+      <option name="project" value="LOCAL" />
+      <updated>1626557274260</updated>
+    </task>
+    <task id="LOCAL-00167" summary="Removed the multiple instances of the PandasModel">
+      <created>1626599546534</created>
+      <option name="number" value="00167" />
+      <option name="presentableId" value="LOCAL-00167" />
+      <option name="project" value="LOCAL" />
+      <updated>1626599546535</updated>
+    </task>
+    <task id="LOCAL-00168" summary="Renamed Net Transfer Capacity to Available Transfer Capacity">
+      <created>1626763749575</created>
+      <option name="number" value="00168" />
+      <option name="presentableId" value="LOCAL-00168" />
+      <option name="project" value="LOCAL" />
+      <updated>1626763749575</updated>
+    </task>
+    <task id="LOCAL-00169" summary="Renamed the time series template">
+      <created>1626935522454</created>
+      <option name="number" value="00169" />
+      <option name="presentableId" value="LOCAL-00169" />
+      <option name="project" value="LOCAL" />
+      <updated>1626935522454</updated>
+    </task>
+    <task id="LOCAL-00170" summary="Improved the ATC by allowing power flow inputs&#10;Added the NTC column to the report&#10;Improved coordinates import GUI">
+      <created>1626968100246</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1626968100246</updated>
+    </task>
+    <task id="LOCAL-00171" summary="Improvements in handling bad inputs">
+      <created>1626978592622</created>
+      <option name="number" value="00171" />
+      <option name="presentableId" value="LOCAL-00171" />
+      <option name="project" value="LOCAL" />
+      <updated>1626978592622</updated>
+    </task>
+    <task id="LOCAL-00172" summary="Minor changes to setup.py">
+      <created>1626982713282</created>
+      <option name="number" value="00172" />
+      <option name="presentableId" value="LOCAL-00172" />
+      <option name="project" value="LOCAL" />
+      <updated>1626982713282</updated>
+    </task>
+    <task id="LOCAL-00173" summary="Improved ATC reporting&#10;Included Real flows in theATC time series">
+      <created>1626984462077</created>
+      <option name="number" value="00173" />
+      <option name="presentableId" value="LOCAL-00173" />
+      <option name="project" value="LOCAL" />
+      <updated>1626984462077</updated>
+    </task>
+    <task id="LOCAL-00174" summary="Improved area selection for the ATC. Now multiple Areas can be selected">
+      <created>1627122751864</created>
+      <option name="number" value="00174" />
+      <option name="presentableId" value="LOCAL-00174" />
+      <option name="project" value="LOCAL" />
+      <updated>1627122751865</updated>
+    </task>
+    <task id="LOCAL-00175" summary="Fixed critical bug related to the voltages&#10;&#10;Fixed handling of the node groups threading">
+      <created>1627128037236</created>
+      <option name="number" value="00175" />
+      <option name="presentableId" value="LOCAL-00175" />
+      <option name="project" value="LOCAL" />
+      <updated>1627128037237</updated>
+    </task>
+    <task id="LOCAL-00176" summary="Improved the about dialogue">
+      <created>1627131496564</created>
+      <option name="number" value="00176" />
+      <option name="presentableId" value="LOCAL-00176" />
+      <option name="project" value="LOCAL" />
+      <updated>1627131496564</updated>
+    </task>
+    <task id="LOCAL-00177" summary="Improved voltage initialization">
+      <created>1627292840628</created>
+      <option name="number" value="00177" />
+      <option name="presentableId" value="LOCAL-00177" />
+      <option name="project" value="LOCAL" />
+      <updated>1627292840629</updated>
+    </task>
+    <task id="LOCAL-00178" summary="Moved the oltages initialization and it seems to work">
+      <created>1627304636756</created>
+      <option name="number" value="00178" />
+      <option name="presentableId" value="LOCAL-00178" />
+      <option name="project" value="LOCAL" />
+      <updated>1627304636756</updated>
+    </task>
+    <task id="LOCAL-00179" summary="Improved .RAW reading">
+      <created>1627311389435</created>
+      <option name="number" value="00179" />
+      <option name="presentableId" value="LOCAL-00179" />
+      <option name="project" value="LOCAL" />
+      <updated>1627311389435</updated>
+    </task>
+    <task id="LOCAL-00180" summary="Improved voltage formation">
+      <created>1627373711834</created>
+      <option name="number" value="00180" />
+      <option name="presentableId" value="LOCAL-00180" />
+      <option name="project" value="LOCAL" />
+      <updated>1627373711834</updated>
+    </task>
+    <task id="LOCAL-00181" summary="Added the ability to select branches for contingency&#10;ATC (snapshot) taked into account the contingency_enabled property">
+      <created>1627551118086</created>
+      <option name="number" value="00181" />
+      <option name="presentableId" value="LOCAL-00181" />
+      <option name="project" value="LOCAL" />
+      <updated>1627551118086</updated>
+    </task>
+    <task id="LOCAL-00182" summary="Fixed minor indexing error&#10;The ATC report generation is more straight forward">
+      <created>1627551718682</created>
+      <option name="number" value="00182" />
+      <option name="presentableId" value="LOCAL-00182" />
+      <option name="project" value="LOCAL" />
+      <updated>1627551718682</updated>
+    </task>
+    <task id="LOCAL-00183" summary="Extended the contingency branch selection to the ATC">
+      <created>1627571383097</created>
+      <option name="number" value="00183" />
+      <option name="presentableId" value="LOCAL-00183" />
+      <option name="project" value="LOCAL" />
+      <updated>1627571383097</updated>
+    </task>
+    <task id="LOCAL-00184" summary="Extended the contingency branch selection to the contingency calculation">
+      <created>1627628672649</created>
+      <option name="number" value="00184" />
+      <option name="presentableId" value="LOCAL-00184" />
+      <option name="project" value="LOCAL" />
+      <updated>1627628672649</updated>
+    </task>
+    <task id="LOCAL-00185" summary="Added HVDC base flow to the ATC calculation">
+      <created>1627635508264</created>
+      <option name="number" value="00185" />
+      <option name="presentableId" value="LOCAL-00185" />
+      <option name="project" value="LOCAL" />
+      <updated>1627635508264</updated>
+    </task>
+    <task id="LOCAL-00186" summary="Improved the element deletion experience">
+      <created>1627821363256</created>
+      <option name="number" value="00186" />
+      <option name="presentableId" value="LOCAL-00186" />
+      <option name="project" value="LOCAL" />
+      <updated>1627821363257</updated>
+    </task>
+    <task id="LOCAL-00187" summary="Improved the element deletion experience">
+      <created>1629197721732</created>
+      <option name="number" value="00187" />
+      <option name="presentableId" value="LOCAL-00187" />
+      <option name="project" value="LOCAL" />
+      <updated>1629197721732</updated>
     </task>
     <task id="LOCAL-00188" summary="Fixed slight bug with the transformer templates division by zero">
       <created>1629201241945</created>
@@ -729,299 +906,96 @@
       <option name="project" value="LOCAL" />
       <updated>1632817908414</updated>
     </task>
-    <task id="LOCAL-00197" summary="Updated version">
-      <created>1632818610677</created>
+    <task id="LOCAL-00197" summary="some improvements">
+      <created>1633359829568</created>
       <option name="number" value="00197" />
       <option name="presentableId" value="LOCAL-00197" />
       <option name="project" value="LOCAL" />
-      <updated>1632818610677</updated>
+      <updated>1633359829568</updated>
     </task>
-    <task id="LOCAL-00198" summary="Improve the power world parser">
-      <created>1632923884534</created>
+    <task id="LOCAL-00198" summary="Improved OPF-Time series">
+      <created>1633367060510</created>
       <option name="number" value="00198" />
       <option name="presentableId" value="LOCAL-00198" />
       <option name="project" value="LOCAL" />
-      <updated>1632923884534</updated>
+      <updated>1633367060510</updated>
     </task>
-    <task id="LOCAL-00199" summary="Small bug fixes:&#10;- Added the coordinates in the branches that were missing&#10;- After a very long time, the bus drag and drop has a icon!&#10;- Fixed the kV tooltip thing">
-      <created>1632949796379</created>
+    <task id="LOCAL-00199" summary="Improved OPF-Time series">
+      <created>1633369441132</created>
       <option name="number" value="00199" />
       <option name="presentableId" value="LOCAL-00199" />
       <option name="project" value="LOCAL" />
-      <updated>1632949796379</updated>
+      <updated>1633369441133</updated>
     </task>
-    <task id="LOCAL-00200" summary="Added Activs500g">
-      <created>1632949829511</created>
+    <task id="LOCAL-00200" summary="Improved OPF-Time series with contingencies">
+      <created>1633452773774</created>
       <option name="number" value="00200" />
       <option name="presentableId" value="LOCAL-00200" />
       <option name="project" value="LOCAL" />
-      <updated>1632949829511</updated>
+      <updated>1633452773775</updated>
     </task>
-    <task id="LOCAL-00201" summary="Added epc extension to open dialogue filter">
-      <created>1632951603906</created>
+    <task id="LOCAL-00201" summary="Critical bug fixed: The TowerBuilderGui dd not have a global pointer, &#10;hence the garbage collector was causing clean crashes">
+      <created>1633591598037</created>
       <option name="number" value="00201" />
       <option name="presentableId" value="LOCAL-00201" />
       <option name="project" value="LOCAL" />
-      <updated>1632951603906</updated>
+      <updated>1633591598037</updated>
     </task>
-    <task id="LOCAL-00202" summary="Added new vsc modes">
-      <created>1632998548555</created>
+    <task id="LOCAL-00202" summary="Added selected for dispatch in the proportional generation movement&#10;in the opf-ntc">
+      <created>1633603118601</created>
       <option name="number" value="00202" />
       <option name="presentableId" value="LOCAL-00202" />
       <option name="project" value="LOCAL" />
-      <updated>1632998548555</updated>
+      <updated>1633603118602</updated>
     </task>
-    <task id="LOCAL-00203" summary="improved powerworld converter">
-      <created>1632998564051</created>
+    <task id="LOCAL-00203" summary="Old fashion but fast jacobian WIP">
+      <created>1635086622764</created>
       <option name="number" value="00203" />
       <option name="presentableId" value="LOCAL-00203" />
       <option name="project" value="LOCAL" />
-      <updated>1632998564051</updated>
+      <updated>1635086622764</updated>
     </task>
-    <task id="LOCAL-00204" summary="Added console commands `app.numerical_circuit`and `app.islands`.">
-      <created>1632998575386</created>
+    <task id="LOCAL-00204" summary="Added newton-raphson Lynn's algorithm">
+      <created>1635185954370</created>
       <option name="number" value="00204" />
       <option name="presentableId" value="LOCAL-00204" />
       <option name="project" value="LOCAL" />
-      <updated>1632998575386</updated>
+      <updated>1635185954370</updated>
     </task>
-    <task id="LOCAL-00205" summary="finalized version 4.2.1">
-      <created>1632998589706</created>
+    <task id="LOCAL-00205" summary="Fixed synthax errors of the state stimator">
+      <created>1635497925030</created>
       <option name="number" value="00205" />
       <option name="presentableId" value="LOCAL-00205" />
       <option name="project" value="LOCAL" />
-      <updated>1632998589706</updated>
+      <updated>1635497925031</updated>
     </task>
-    <task id="LOCAL-00206" summary="improved some bugs">
-      <created>1633080774642</created>
+    <task id="LOCAL-00206" summary="Improved PowerWorld's EPC format reader. Now it should support v21 as well">
+      <created>1635594933856</created>
       <option name="number" value="00206" />
       <option name="presentableId" value="LOCAL-00206" />
       <option name="project" value="LOCAL" />
-      <updated>1633080774642</updated>
+      <updated>1635594933856</updated>
     </task>
-    <task id="LOCAL-00207" summary="Fixed CIM export">
-      <created>1633093145139</created>
+    <task id="LOCAL-00207" summary="added 3-node state estimation test">
+      <created>1635596774407</created>
       <option name="number" value="00207" />
       <option name="presentableId" value="LOCAL-00207" />
       <option name="project" value="LOCAL" />
-      <updated>1633093145139</updated>
+      <updated>1635596774407</updated>
     </task>
-    <task id="LOCAL-00208" summary="Fixed CIM export">
-      <created>1633171413746</created>
-      <option name="number" value="00208" />
-      <option name="presentableId" value="LOCAL-00208" />
-      <option name="project" value="LOCAL" />
-      <updated>1633171413747</updated>
-    </task>
-    <task id="LOCAL-00209" summary="Passed the parent (main window) to most of the sub-windows">
-      <created>1633732210351</created>
-      <option name="number" value="00209" />
-      <option name="presentableId" value="LOCAL-00209" />
-      <option name="project" value="LOCAL" />
-      <updated>1633732210351</updated>
-    </task>
-    <task id="LOCAL-00210" summary="Improved the design of the tower builder">
-      <created>1633774436210</created>
-      <option name="number" value="00210" />
-      <option name="presentableId" value="LOCAL-00210" />
-      <option name="project" value="LOCAL" />
-      <updated>1633774436211</updated>
-    </task>
-    <task id="LOCAL-00211" summary="Fixed branch flow in simple OPF&#10;Removed linear AC OPF for the moment&#10;Fixed PuLP initialization">
-      <created>1633792288255</created>
-      <option name="number" value="00211" />
-      <option name="presentableId" value="LOCAL-00211" />
-      <option name="project" value="LOCAL" />
-      <updated>1633792288256</updated>
-    </task>
-    <task id="LOCAL-00212" summary="Implemented dispatcheable in the HVDC line and implemented the NTC OPF mode">
-      <created>1633793367480</created>
-      <option name="number" value="00212" />
-      <option name="presentableId" value="LOCAL-00212" />
-      <option name="project" value="LOCAL" />
-      <updated>1633793367480</updated>
-    </task>
-    <task id="LOCAL-00213" summary="implemented HVDC dispatch in the OPF&#10;Joined it to the power flow non-destructive feed&#10;Added attributes in the compilation functions">
-      <created>1633859600935</created>
-      <option name="number" value="00213" />
-      <option name="presentableId" value="LOCAL-00213" />
-      <option name="project" value="LOCAL" />
-      <updated>1633859600936</updated>
-    </task>
-    <task id="LOCAL-00214" summary="Added branch tap angle optimization in the OPF">
-      <created>1633861130364</created>
-      <option name="number" value="00214" />
-      <option name="presentableId" value="LOCAL-00214" />
-      <option name="project" value="LOCAL" />
-      <updated>1633861130364</updated>
-    </task>
-    <task id="LOCAL-00215" summary="OPF sign corrected">
-      <created>1633861540378</created>
-      <option name="number" value="00215" />
-      <option name="presentableId" value="LOCAL-00215" />
-      <option name="project" value="LOCAL" />
-      <updated>1633861540378</updated>
-    </task>
-    <task id="LOCAL-00216" summary="Implemented HVDC and phase shift into the OPF time series">
-      <created>1633874574582</created>
-      <option name="number" value="00216" />
-      <option name="presentableId" value="LOCAL-00216" />
-      <option name="project" value="LOCAL" />
-      <updated>1633874574582</updated>
-    </task>
-    <task id="LOCAL-00217" summary="added transformer angle and tap module profiles">
-      <created>1633875493750</created>
-      <option name="number" value="00217" />
-      <option name="presentableId" value="LOCAL-00217" />
-      <option name="project" value="LOCAL" />
-      <updated>1633875493750</updated>
-    </task>
-    <task id="LOCAL-00218" summary="Added contingencies to the OPF simulations&#10;Added the contingency report as a compromise to show the contingencies">
-      <created>1634136542079</created>
-      <option name="number" value="00218" />
-      <option name="presentableId" value="LOCAL-00218" />
-      <option name="project" value="LOCAL" />
-      <updated>1634136542079</updated>
-    </task>
-    <task id="LOCAL-00219" summary="Added PTDF contingency tolerance">
-      <created>1634138472418</created>
-      <option name="number" value="00219" />
-      <option name="presentableId" value="LOCAL-00219" />
-      <option name="project" value="LOCAL" />
-      <updated>1634138472418</updated>
-    </task>
-    <task id="LOCAL-00220" summary="Implemented the skip generation in the dc opf">
-      <created>1634138565931</created>
-      <option name="number" value="00220" />
-      <option name="presentableId" value="LOCAL-00220" />
-      <option name="project" value="LOCAL" />
-      <updated>1634138565931</updated>
-    </task>
-    <task id="LOCAL-00221" summary="Version 4.2.4">
-      <created>1634139632205</created>
-      <option name="number" value="00221" />
-      <option name="presentableId" value="LOCAL-00221" />
-      <option name="project" value="LOCAL" />
-      <updated>1634139632205</updated>
-    </task>
-    <task id="LOCAL-00222" summary="Implemented optional way to open the web maps when the pyside webdriver is not available">
-      <created>1634571179268</created>
-      <option name="number" value="00222" />
-      <option name="presentableId" value="LOCAL-00222" />
-      <option name="project" value="LOCAL" />
-      <updated>1634571179269</updated>
-    </task>
-    <task id="LOCAL-00223" summary="implemented simpler zoom by selecting and adjusting the screen">
-      <created>1634571787400</created>
-      <option name="number" value="00223" />
-      <option name="presentableId" value="LOCAL-00223" />
-      <option name="project" value="LOCAL" />
-      <updated>1634571787400</updated>
-    </task>
-    <task id="LOCAL-00224" summary="For apple M1 use GLOP when using ortools">
-      <created>1634668672037</created>
-      <option name="number" value="00224" />
-      <option name="presentableId" value="LOCAL-00224" />
-      <option name="project" value="LOCAL" />
-      <updated>1634668672037</updated>
-    </task>
-    <task id="LOCAL-00225" summary="4.2.6">
-      <created>1634829329676</created>
-      <option name="number" value="00225" />
-      <option name="presentableId" value="LOCAL-00225" />
-      <option name="project" value="LOCAL" />
-      <updated>1634829329676</updated>
-    </task>
-    <task id="LOCAL-00226" summary="Improved analysis dialogue adding a new column and transformer virtual taps support&#10;Added transformer virtual taps into the array viewer&#10;Added &quot;correct_shit&quot; function to GridCalMain.py">
-      <created>1635877776203</created>
-      <option name="number" value="00226" />
-      <option name="presentableId" value="LOCAL-00226" />
-      <option name="project" value="LOCAL" />
-      <updated>1635877776203</updated>
-    </task>
-    <task id="LOCAL-00227" summary="improved NTC report">
-      <created>1635955145687</created>
-      <option name="number" value="00227" />
-      <option name="presentableId" value="LOCAL-00227" />
-      <option name="project" value="LOCAL" />
-      <updated>1635955145688</updated>
-    </task>
-    <task id="LOCAL-00228" summary="Fixed silly error with SE">
-      <created>1635960324432</created>
-      <option name="number" value="00228" />
-      <option name="presentableId" value="LOCAL-00228" />
-      <option name="project" value="LOCAL" />
-      <updated>1635960324432</updated>
-    </task>
-    <task id="LOCAL-00229" summary="Moved NTC-OPF formulation out of the class">
-      <created>1636030544680</created>
-      <option name="number" value="00229" />
-      <option name="presentableId" value="LOCAL-00229" />
-      <option name="project" value="LOCAL" />
-      <updated>1636030544681</updated>
-    </task>
-    <task id="LOCAL-00230" summary="Added node balance check in the NTC opf">
-      <created>1636104721959</created>
-      <option name="number" value="00230" />
-      <option name="presentableId" value="LOCAL-00230" />
-      <option name="project" value="LOCAL" />
-      <updated>1636104721959</updated>
-    </task>
-    <task id="LOCAL-00231" summary="Added more explicative values">
-      <created>1636106809618</created>
-      <option name="number" value="00231" />
-      <option name="presentableId" value="LOCAL-00231" />
-      <option name="project" value="LOCAL" />
-      <updated>1636106809618</updated>
-    </task>
-    <task id="LOCAL-00232" summary="Added N-1 exploration">
-      <created>1636368509985</created>
-      <option name="number" value="00232" />
-      <option name="presentableId" value="LOCAL-00232" />
-      <option name="project" value="LOCAL" />
-      <updated>1636368509985</updated>
-    </task>
-    <task id="LOCAL-00233" summary="Added NTC-OPF previous checking using DC power flow and contingency analysis">
-      <created>1636372248527</created>
-      <option name="number" value="00233" />
-      <option name="presentableId" value="LOCAL-00233" />
-      <option name="project" value="LOCAL" />
-      <updated>1636372248527</updated>
-    </task>
-    <task id="LOCAL-00234" summary="changed version">
-      <created>1636372507097</created>
-      <option name="number" value="00234" />
-      <option name="presentableId" value="LOCAL-00234" />
-      <option name="project" value="LOCAL" />
-      <updated>1636372507097</updated>
-    </task>
-    <task id="LOCAL-00235" summary="Fixed indices in the NTC pre-solve and the linear contingency analysis">
-      <created>1636377923117</created>
-      <option name="number" value="00235" />
-      <option name="presentableId" value="LOCAL-00235" />
-      <option name="project" value="LOCAL" />
-      <updated>1636377923117</updated>
-    </task>
-    <task id="LOCAL-00236" summary="Fixed indices in the NTC pre-solve and the linear contingency analysis">
-      <created>1636378189099</created>
-      <option name="number" value="00236" />
-      <option name="presentableId" value="LOCAL-00236" />
-      <option name="project" value="LOCAL" />
-      <updated>1636378189099</updated>
-    </task>
-    <option name="localTasksCounter" value="237" />
+    <option name="localTasksCounter" value="208" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.History.Properties">
-    <option name="COLUMN_ID_ORDER">
+    <option name="COLUMN_ORDER">
       <list>
-        <option value="Default.Root" />
-        <option value="Default.Author" />
-        <option value="Default.Date" />
-        <option value="Default.Subject" />
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
       </list>
     </option>
   </component>
@@ -1043,32 +1017,32 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed branch flow in simple OPF&#10;Removed linear AC OPF for the moment&#10;Fixed PuLP initialization" />
-    <MESSAGE value="Implemented dispatcheable in the HVDC line and implemented the NTC OPF mode" />
-    <MESSAGE value="implemented HVDC dispatch in the OPF&#10;Joined it to the power flow non-destructive feed&#10;Added attributes in the compilation functions" />
-    <MESSAGE value="Added branch tap angle optimization in the OPF" />
-    <MESSAGE value="OPF sign corrected" />
-    <MESSAGE value="Implemented HVDC and phase shift into the OPF time series" />
-    <MESSAGE value="added transformer angle and tap module profiles" />
-    <MESSAGE value="Added contingencies to the OPF simulations&#10;Added the contingency report as a compromise to show the contingencies" />
-    <MESSAGE value="Added PTDF contingency tolerance" />
-    <MESSAGE value="Implemented the skip generation in the dc opf" />
-    <MESSAGE value="Version 4.2.4" />
-    <MESSAGE value="Implemented optional way to open the web maps when the pyside webdriver is not available" />
-    <MESSAGE value="implemented simpler zoom by selecting and adjusting the screen" />
-    <MESSAGE value="For apple M1 use GLOP when using ortools" />
-    <MESSAGE value="4.2.6" />
-    <MESSAGE value="Improved analysis dialogue adding a new column and transformer virtual taps support&#10;Added transformer virtual taps into the array viewer&#10;Added &quot;correct_shit&quot; function to GridCalMain.py" />
-    <MESSAGE value="improved NTC report" />
-    <MESSAGE value="Fixed silly error with SE" />
-    <MESSAGE value="Moved NTC-OPF formulation out of the class" />
-    <MESSAGE value="Added node balance check in the NTC opf" />
-    <MESSAGE value="Added more explicative values" />
-    <MESSAGE value="Added N-1 exploration" />
-    <MESSAGE value="Added NTC-OPF previous checking using DC power flow and contingency analysis" />
-    <MESSAGE value="changed version" />
-    <MESSAGE value="Fixed indices in the NTC pre-solve and the linear contingency analysis" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed indices in the NTC pre-solve and the linear contingency analysis" />
+    <MESSAGE value="Improved voltage formation" />
+    <MESSAGE value="Added the ability to select branches for contingency&#10;ATC (snapshot) taked into account the contingency_enabled property" />
+    <MESSAGE value="Fixed minor indexing error&#10;The ATC report generation is more straight forward" />
+    <MESSAGE value="Extended the contingency branch selection to the ATC" />
+    <MESSAGE value="Extended the contingency branch selection to the contingency calculation" />
+    <MESSAGE value="Added HVDC base flow to the ATC calculation" />
+    <MESSAGE value="Improved the element deletion experience" />
+    <MESSAGE value="Fixed slight bug with the transformer templates division by zero" />
+    <MESSAGE value="Improved changelog" />
+    <MESSAGE value="Final version number 4.2.0" />
+    <MESSAGE value="Improved OPF NTC:&#10;- More slacks at the results&#10;- Ability to have optimal and proportional generation&#10;- Changed GUI accordingly" />
+    <MESSAGE value="Improved NTC formulation by converting the areaSlack to power shift and removing a potential conflict" />
+    <MESSAGE value="Updated GUI" />
+    <MESSAGE value="Improved the slack checking" />
+    <MESSAGE value="Added inputs analysis" />
+    <MESSAGE value="some improvements" />
+    <MESSAGE value="Improved OPF-Time series" />
+    <MESSAGE value="Improved OPF-Time series with contingencies" />
+    <MESSAGE value="Critical bug fixed: The TowerBuilderGui dd not have a global pointer, &#10;hence the garbage collector was causing clean crashes" />
+    <MESSAGE value="Added selected for dispatch in the proportional generation movement&#10;in the opf-ntc" />
+    <MESSAGE value="Old fashion but fast jacobian WIP" />
+    <MESSAGE value="Added newton-raphson Lynn's algorithm" />
+    <MESSAGE value="Fixed synthax errors of the state stimator" />
+    <MESSAGE value="Improved PowerWorld's EPC format reader. Now it should support v21 as well" />
+    <MESSAGE value="added 3-node state estimation test" />
+    <option name="LAST_COMMIT_MESSAGE" value="added 3-node state estimation test" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1221,17 +1195,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py</url>
-          <line>1162</line>
+          <line>1166</line>
           <option name="timeStamp" value="418" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py</url>
-          <line>1188</line>
+          <line>1192</line>
           <option name="timeStamp" value="419" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py</url>
-          <line>1185</line>
+          <line>1189</line>
           <option name="timeStamp" value="420" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -1385,6 +1359,11 @@
           <option name="timeStamp" value="766" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/ATC/available_transfer_capacity_driver.py</url>
+          <line>384</line>
+          <option name="timeStamp" value="793" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/GridCal/Gui/Main/GridCalMain.py</url>
           <line>3048</line>
           <option name="timeStamp" value="798" />
@@ -1430,40 +1409,34 @@
           <option name="timeStamp" value="839" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/ATC/available_transfer_capacity_driver.py</url>
-          <line>571</line>
-          <option name="timeStamp" value="841" />
+          <url>file://$PROJECT_DIR$/src/research/jacobian/jacobian_gomez_exposito.py</url>
+          <line>504</line>
+          <option name="timeStamp" value="846" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/research/state_estimation/5_bus_se.py</url>
-          <line>34</line>
+          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py</url>
+          <line>367</line>
           <option name="timeStamp" value="848" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/tests/test_state_estimation.py</url>
-          <line>56</line>
-          <option name="timeStamp" value="850" />
+          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/PowerFlow/jacobian_based_power_flow.py</url>
+          <line>397</line>
+          <option name="timeStamp" value="849" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/StateEstimation/state_stimation_driver.py</url>
+          <line>255</line>
+          <option name="timeStamp" value="852" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/StateEstimation/state_estimation.py</url>
-          <line>285</line>
-          <option name="timeStamp" value="851" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/OPF/ntc_opf.py</url>
-          <line>320</line>
+          <line>391</line>
           <option name="timeStamp" value="853" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <condition expression="'14130_AT' == generator_names[gen_idx]" language="Python" />
-          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/OPF/ntc_opf.py</url>
-          <line>467</line>
-          <option name="timeStamp" value="862" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/OPF/opf_ntc_driver.py</url>
-          <line>520</line>
-          <option name="timeStamp" value="867" />
+          <url>file://$PROJECT_DIR$/src/GridCal/Engine/Simulations/StateEstimation/state_stimation_driver.py</url>
+          <line>269</line>
+          <option name="timeStamp" value="855" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -1583,7 +1556,7 @@
     <SUITE FILE_PATH="coverage/GridCal$Nosetests_in_PTDF_research2_py.coverage" NAME="Nosetests in PTDF_research2.py Coverage Results" MODIFIED="1600161918846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/research/PTDF" />
     <SUITE FILE_PATH="coverage/GridCal$time_series.coverage" NAME="time_series Coverage Results" MODIFIED="1617809423186" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/Tutorials" />
     <SUITE FILE_PATH="coverage/GridCal$Nosetests_in_test_power_flow_py.coverage" NAME="Nosetests in test_power_flow.py Coverage Results" MODIFIED="1632998750088" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
-    <SUITE FILE_PATH="coverage/GridCal$ExecuteGridCal.coverage" NAME="ExecuteGridCal Coverage Results" MODIFIED="1636537071039" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/GridCal" />
+    <SUITE FILE_PATH="coverage/GridCal$ExecuteGridCal.coverage" NAME="ExecuteGridCal Coverage Results" MODIFIED="1636563296602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/GridCal" />
     <SUITE FILE_PATH="coverage/GridCal$binary_ga.coverage" NAME="binary_ga Coverage Results" MODIFIED="1615226727819" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/research/genetic_algorithms" />
     <SUITE FILE_PATH="coverage/GridCal$Nosetests_in_test_opf_py.coverage" NAME="Nosetests in test_opf.py Coverage Results" MODIFIED="1632998728805" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/GridCal$Nosetests_in_test_line_losses_py.coverage" NAME="Nosetests in test_line_losses.py Coverage Results" MODIFIED="1634139762786" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />

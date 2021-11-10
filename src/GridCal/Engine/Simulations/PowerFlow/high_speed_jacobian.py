@@ -30,6 +30,7 @@
 
 import numba as nb
 from numba import jit, njit
+from numba.typed import List
 from numpy import conj, abs
 from numpy import complex128, float64, int32
 from numpy.core.multiarray import zeros, empty
@@ -246,7 +247,7 @@ def create_J_no_pv(dS_dVm, dS_dVa, Yp, Yj, pvpq_lookup, pvpq, Jx, Jj, Jp):  # pr
         Jp[r + lpvpq + 1] = nnz - nnzStart + Jp[r + lpvpq]
 
 
-def AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq):
+def jacobian_ac(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq):
     """
     Create the AC Jacobian function with no embedded controls
     :param Ybus: Ybus matrix in CSC format
@@ -285,7 +286,6 @@ def AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq):
     # generate scipy sparse matrix
     nj = npv + npq + npq
     return csr_matrix((Jx, Jj, Jp), shape=(nj, nj))
-
 
 
 
@@ -416,7 +416,7 @@ def jacobian_numba(nbus, Gi, Gp, Gx, Bx, P, Q, E, F, Vm, pq, pvpq):
     return Jx, Ji, Jp, n_rows, n_cols, nnz
 
 
-def AC_jacobian2(Y, S, V, Vm, pq, pv):
+def jacobian_lynn(Y, S, V, Vm, pq, pv):
 
     Jx, Ji, Jp, n_rows, n_cols, nnz = jacobian_numba(nbus=len(S),
                                                      Gi=Y.indices, Gp=Y.indptr, Gx=Y.data.real,
@@ -428,3 +428,297 @@ def AC_jacobian2(Y, S, V, Vm, pq, pv):
     Ji = np.resize(Ji, nnz)
 
     return csc_matrix((Jx, Ji, Jp), shape=(n_rows, n_cols))
+
+
+
+@nb.njit(cache=True)
+def fill_derivatives(Yx, Yp, Yi, V, E, dS_dVm, dS_dVa):
+    """
+    Compute the power injection derivatives w.r.t the voltage module and angle
+    :param Yx: data of Ybus in CSC format
+    :param Yp: indptr of Ybus in CSC format
+    :param Yi: indices of Ybus in CSC format
+    :param V: Voltages vector
+    :return: dS_dVm, dS_dVa data ordered in the CSC format to match the indices of Ybus
+    """
+
+    """
+    The matrix operations that this is performing are:
+
+    diagV = diags(V)
+    diagE = diags(V / np.abs(V))
+    Ibus = Ybus * V
+    diagIbus = diags(Ibus)
+
+    dSbus_dVa = 1j * diagV * np.conj(diagIbus - Ybus * diagV)
+    dSbus_dVm = diagV * np.conj(Ybus * diagE) + np.conj(diagIbus) * diagE    
+    """
+
+    # init buffer vector
+    n = len(Yp) - 1
+    Ibus = np.zeros(n, dtype=np.complex128)
+
+    # copy the data into the arrays
+    for k in range(len(Yx)):
+        dS_dVm[k] = Yx[k]
+        dS_dVa[k] = Yx[k]
+
+    # pass 1: perform the matrix-vector products
+    for j in range(n):  # for each column ...
+        for k in range(Yp[j], Yp[j + 1]):  # for each row ...
+            # row index
+            i = Yi[k]
+
+            # Ibus = Ybus * V
+            Ibus[i] += Yx[k] * V[j]  # Yx[k] -> Y(i,j)
+
+            # Ybus * diagE
+            dS_dVm[k] = Yx[k] * E[j]
+
+            # Ybus * diag(V)
+            dS_dVa[k] = Yx[k] * V[j]
+
+    # pass 2: finalize the operations
+    for j in range(n):  # for each column ...
+
+        # set buffer variable:
+        # this operation cannot be done in the pass1
+        # because Ibus is not fully formed, but here it is.
+        buffer = np.conj(Ibus[j]) * E[j]
+
+        for k in range(Yp[j], Yp[j + 1]):  # for each row ...
+
+            # row index
+            i = Yi[k]
+
+            # diag(V) * conj(Ybus * diagE)
+            dS_dVm[k] = V[i] * np.conj(dS_dVm[k])
+
+            if j == i:
+                # diagonal elements
+                dS_dVa[k] -= Ibus[j]
+                dS_dVm[k] += buffer
+
+            # 1j * diagV * conj(diagIbus - Ybus * diagV)
+            dS_dVa[k] = np.conj(-dS_dVa[k]) * (1j * V[i])
+
+
+@nb.njit()
+def createAcJacobian(nbus, Yp, Yi, pvpq, pq, dS_dVm, dS_dVa, Jx, Ji, Jp):
+    npqpv = len(pvpq)
+    n_rows = len(pvpq) + len(pq)
+    n_cols = len(pvpq) + len(pq)
+    nnz = 0
+    p = 0
+    Jp[p] = 0
+
+    # generate lookup for the non immediate axis (for CSC it is the rows) -> index lookup
+    lookup_pvpq = np.zeros(nbus, dtype=nb.int32)
+    lookup_pvpq[pvpq] = np.arange(len(pvpq), dtype=nb.int32)
+
+    lookup_pq = np.zeros(nbus, dtype=nb.int32)
+    lookup_pq[pq] = np.arange(len(pq), dtype=nb.int32)
+
+    J1_lookup = List()
+    J2_lookup = List()
+    J3_lookup = List()
+    J4_lookup = List()
+
+    for j in pvpq:  # sliced columns
+
+        # fill in J1
+        for k in range(Yp[j], Yp[j + 1]):  # rows of A[:, j]
+
+            # row index translation to the "rows" space
+            i = Yi[k]
+            ii = lookup_pvpq[i]
+
+            if pvpq[ii] == i:  # rows
+                # entry found
+                Jx[nnz] = dS_dVa[k].real
+                Ji[nnz] = ii
+                J1_lookup.append((nnz, k))
+                nnz += 1
+
+        # fill in J3
+        for k in range(Yp[j], Yp[j + 1]):  # rows of A[:, j]
+
+            # row index translation to the "rows" space
+            i = Yi[k]
+            ii = lookup_pq[i]
+
+            if pq[ii] == i:  # rows
+                # entry found
+                Jx[nnz] = dS_dVa[k].imag
+                Ji[nnz] = ii + npqpv
+                J3_lookup.append((nnz, k))
+                nnz += 1
+
+        p += 1
+        Jp[p] = nnz
+
+    # J2 and J4
+    for j in pq:  # sliced columns
+
+        # fill in J2
+        for k in range(Yp[j], Yp[j + 1]):  # rows of A[:, j]
+
+            # row index translation to the "rows" space
+            i = Yi[k]
+            ii = lookup_pvpq[i]
+
+            if pvpq[ii] == i:  # rows
+                # entry found
+                Jx[nnz] = dS_dVm[k].real
+                Ji[nnz] = ii
+                J2_lookup.append((nnz, k))
+                nnz += 1
+
+        # fill in J4
+        for k in range(Yp[j], Yp[j + 1]):  # rows of A[:, j]
+
+            # row index translation to the "rows" space
+            i = Yi[k]
+            ii = lookup_pq[i]
+
+            if pq[ii] == i:  # rows
+                # entry found
+                Jx[nnz] = dS_dVm[k].imag
+                Ji[nnz] = ii + npqpv
+                J4_lookup.append((nnz, k))
+                nnz += 1
+
+        p += 1
+        Jp[p] = nnz
+
+    # last pointer entry
+    Jp[p] = nnz
+
+    # reseize
+    # Jx = np.resize(Jx, nnz)
+    # Ji = np.resize(Ji, nnz)
+
+    return nnz, J1_lookup, J2_lookup, J3_lookup, J4_lookup
+
+
+@nb.njit(cache=True)
+def updateAcJacobian(J1_lookup, J2_lookup, J3_lookup, J4_lookup, dS_dVm, dS_dVa, Jx ):
+
+    for i, k in J1_lookup:
+        Jx[i] = dS_dVa[k].real
+
+    for i, k in J3_lookup:
+        Jx[i] = dS_dVa[k].imag
+
+    for i, k in J2_lookup:
+        Jx[i] = dS_dVm[k].real
+
+    for i, k in J4_lookup:
+        Jx[i] = dS_dVm[k].imag
+
+
+class AcJacobian:
+
+    def __init__(self, Ynnz, npq, npv):
+        """
+
+        :param Ynnz:
+        :param npq:
+        :param npv:
+        """
+        self._n_rows = npv + 2 * npq
+        self._n_cols = self._n_rows
+
+        self._Jx = np.empty(Ynnz * 4, dtype=float)
+        self._Ji = np.empty(Ynnz * 4, dtype=int)
+        self._Jp = np.empty(self._n_cols + 1, dtype=int)
+
+        self._dS_dVm = np.empty(Ynnz, dtype=complex)
+        self._dS_dVa = np.empty(Ynnz, dtype=complex)
+
+        self.initialized = False
+
+        self.J1_lookup = List()
+        self.J2_lookup = List()
+        self.J3_lookup = List()
+        self.J4_lookup = List()
+
+        self.__J__ = None
+
+    def createOrUpdate(self, Y: csc_matrix, V: np.ndarray, Vabs: np.ndarray,
+                       pq: np.ndarray, pvpq: np.ndarray):
+        """
+
+        :param Y:
+        :param S:
+        :param V:
+        :param Vabs:
+        :param pq:
+        :param pvpq:
+        :return:
+        """
+        # fill the deriavtives no matter what
+        fill_derivatives(Yx=Y.data,
+                         Yp=Y.indptr,
+                         Yi=Y.indices,
+                         V=V,
+                         E=V/Vabs,
+                         dS_dVm=self._dS_dVm,
+                         dS_dVa=self._dS_dVa)
+
+        if not self.initialized:
+
+            nnz, \
+            self.J1_lookup, \
+            self.J2_lookup, \
+            self.J3_lookup, \
+            self.J4_lookup = createAcJacobian(nbus=Y.shape[0],
+                                              Yp=Y.indptr,
+                                              Yi=Y.indices,
+                                              pvpq=pvpq,
+                                              pq=pq,
+                                              dS_dVm=self._dS_dVm,
+                                              dS_dVa=self._dS_dVa,
+                                              Jx=self._Jx,
+                                              Ji=self._Ji,
+                                              Jp=self._Jp)
+
+            # np.resize cannot be done with numba
+            self._Jx = np.resize(self._Jx, nnz)
+            self._Ji = np.resize(self._Ji, nnz)
+
+            # create the matrix only once
+            # print('Ji', self._Ji)
+            # print('Jx', self._Jx)
+            # print('Jp', self._Jp)
+            # the copy is because internally it'll sort the vector
+            self.__J__ = csc_matrix((self._Jx, self._Ji.copy(), self._Jp),
+                                    shape=(self._n_rows, self._n_cols))
+
+            # print(self.__J__.toarray())
+
+            self.initialized = True
+        else:
+            # fast update the jacobian
+            updateAcJacobian(J1_lookup=self.J1_lookup,
+                             J2_lookup=self.J2_lookup,
+                             J3_lookup=self.J3_lookup,
+                             J4_lookup=self.J4_lookup,
+                             dS_dVm=self._dS_dVm,
+                             dS_dVa=self._dS_dVa,
+                             Jx=self._Jx)
+            # print('Ji', self._Ji)
+            # print('Jx', self._Jx)
+            # print('Jp', self._Jp)
+
+            # the copy is because internally it'll sort the vector
+            self.__J__ = csc_matrix((self._Jx, self._Ji.copy(), self._Jp),
+                                    shape=(self._n_rows, self._n_cols))
+
+            # print(self.__J__.toarray())
+
+    def getJ(self) -> csc_matrix:
+        return self.__J__
+
+    def reset(self):
+        self.initialized = False

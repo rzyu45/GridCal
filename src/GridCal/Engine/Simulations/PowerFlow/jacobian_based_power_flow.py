@@ -20,7 +20,7 @@ import numpy as np
 
 from GridCal.Engine.Simulations.sparse_solve import get_sparse_type, get_linear_solver
 from GridCal.Engine.Simulations.PowerFlow.numba_functions import calc_power_csr_numba, diag
-from GridCal.Engine.Simulations.PowerFlow.high_speed_jacobian import AC_jacobian, AC_jacobian2
+from GridCal.Engine.Simulations.PowerFlow.high_speed_jacobian import jacobian_ac, jacobian_lynn, AcJacobian
 from GridCal.Engine.Simulations.PowerFlow.power_flow_results import NumericPowerFlowResults
 from GridCal.Engine.basic_structures import ReactivePowerControlMode
 from GridCal.Engine.Simulations.PowerFlow.discrete_controls import control_q_inside_method
@@ -120,7 +120,7 @@ def mu(Ybus, Ibus, J, pvpq_lookup, incS, dV, dx, pvpq, pq, npv, npq):
     # pvpq_lookup = np.zeros(np.max(Ybus.indices) + 1, dtype=int)
     # pvpq_lookup[pvpq] = np.arange(len(pvpq))
 
-    J2 = AC_jacobian(Ybus, dV, pvpq, pq, pvpq_lookup, npv, npq)
+    J2 = jacobian_ac(Ybus, dV, pvpq, pq, pvpq_lookup, npv, npq)
     # J2 = Jacobian(Ybus, dV, Ibus, pq, pvpq)
 
     a = incS
@@ -315,7 +315,7 @@ def NR_LS_lynn(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max_it=15, mu_0
             iter_ += 1
 
             # evaluate Jacobian
-            J = AC_jacobian2(Ybus, Scalc, V, Vm, pq, pv)
+            J = jacobian_lynn(Ybus, Scalc, V, Vm, pq, pv)
 
             # compute update step
             dx = linear_solver(J, f)
@@ -449,9 +449,8 @@ def NR_LS(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max_it=15, mu_0=1.0,
     npq = len(pq)
     npvpq = npv + npq
 
-    # j1 = 0
-    # j2 = npv + npq  # j1:j2 - V angle of pv and pq buses
-    # j3 = j2 + npq  # j2:j3 - V mag of pq buses
+    # create Jacobian structure
+    # jac = AcJacobian(Ynnz=len(Ybus.data), npq=npq, npv=npv)
 
     if npvpq > 0:
 
@@ -479,17 +478,21 @@ def NR_LS(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max_it=15, mu_0=1.0,
 
             # evaluate Jacobian
             # J = Jacobian(Ybus, V, Ibus, pq, pvpq)
-            J = AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
-            # J = AC_jacobian2(Ybus, Scalc, V, Vm, pq, pv)
+            J = jacobian_ac(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
+            # print('-' * 200)
+            # print('J1:\n', J.toarray())
 
-            # print(V.real)
-            # print(V.imag)
-            # print(Scalc.real)
-            # print(Scalc.imag)
-            # print(J.todense())
+            # jac.createOrUpdate(Y=Ybus, V=V, Vabs=np.abs(V), pq=pq, pvpq=pvpq)
+            # J2 = jac.getJ().tocsc()
+            # print('\n\nJ2:\n', J2.toarray())
+            # J.sort_indices()
+            # J2.sort_indices()
+            # print('All close', np.allclose(J.tocsc().data, J2.data))
+
 
             # compute update step
             dx = linear_solver(J, f)
+            # dx = linear_solver(jac.getJ(), f)
 
             # print(dx)
 
@@ -561,6 +564,7 @@ def NR_LS(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max_it=15, mu_0=1.0,
                     npvpq = npv + npq
                     pvpq_lookup = np.zeros(np.max(Ybus.indices) + 1, dtype=int)
                     pvpq_lookup[pvpq] = np.arange(npvpq)
+                    # jac.reset()
 
                     # recompute the error based on the new Sbus
                     dS = Scalc - Sbus  # complex power mismatch
@@ -782,7 +786,7 @@ def IwamotoNR(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max_it=15,
 
             # evaluate Jacobian
             # J = Jacobian(Ybus, V, Ibus, pq, pvpq)
-            J = AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
+            J = jacobian_ac(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
 
             # compute update step
             try:
@@ -923,7 +927,7 @@ def levenberg_marquardt_pf(Ybus, Sbus_, V0, Ibus, pv_, pq_, Qmin, Qmax, tol, max
 
             # evaluate Jacobian
             if update_jacobian:
-                H = AC_jacobian(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
+                H = jacobian_ac(Ybus, V, pvpq, pq, pvpq_lookup, npv, npq)
                 # H = Jacobian(Ybus, V, Ibus, pq, pvpq)
 
             # evaluate the solution error F(x0)
