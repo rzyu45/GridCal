@@ -65,7 +65,7 @@ To do this the graphic objects call "parent.circuit.<function or object>"
 
 class EditorGraphicsView(QGraphicsView):
 
-    def __init__(self, scene, parent=None, editor=None):
+    def __init__(self, scene, parent: "GridEditor" = None, editor: "GridEditor" =None):
         """
         Editor where the diagram is displayed
         @param scene: DiagramScene object
@@ -80,13 +80,12 @@ class EditorGraphicsView(QGraphicsView):
         self.setInteractive(True)
         self.scene_ = scene
         self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
-        self.editor = editor
+        self.editor: "GridEditor" = editor
         self.setAlignment(Qt.AlignCenter)
 
     def adapt_map_size(self):
         w = self.size().width()
         h = self.size().height()
-        print('EditorGraphicsView size: ', w, h)
         self.map.change_size(w, h)
 
     def dragEnterEvent(self, event):
@@ -154,6 +153,42 @@ class EditorGraphicsView(QGraphicsView):
         else:
             # Zooming out
             self.scale(1.0 / scale_factor, 1.0 / scale_factor)
+
+    # def mousePressEvent(self, event: QMouseEvent) -> None:
+    #
+    #     if event.button() == Qt.LeftButton:
+    #
+    #         pos = self.mapToScene(event.pos())
+    #         self._is_drawing_path = True
+    #         self._current_path = Path(source=pos, destination=pos)
+    #         self.scene().addItem(self._current_path)
+    #
+    #         return
+    #
+    #     super(EditorGraphicsView, self).mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+
+        pos = self.mapToScene(event.pos())
+
+        if self.editor.started_branch:
+            self.editor.started_branch.setEndPos(pos)
+            self.scene().update(self.sceneRect())
+            return
+
+        super(EditorGraphicsView, self).mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+
+        pos = self.mapToScene(event.pos())
+
+        if self.editor.started_branch:
+            self.editor.started_branch.setEndPos(pos)
+            self.editor.scene_mouse_release_event(event=event)
+            self.scene().update(self.sceneRect())
+            return
+
+        super(EditorGraphicsView, self).mouseReleaseEvent(event)
 
     def add_bus(self, bus: Bus, explode_factor=1.0):
         """
@@ -482,34 +517,6 @@ class DiagramScene(QGraphicsScene):
                 # plot the profiles
                 plt.show()
 
-
-        # fig = plt.figure(figsize=(12, 8))
-        #
-        # ax_1 = fig.add_subplot(211)
-        # ax_2 = fig.add_subplot(212, sharex=ax_1)
-        #
-        # x = self.circuit.time_profile
-        # if x is not None:
-        #     if len(x) > 0:
-        #         # loading
-        #         y = api_object.Pset_prof / (api_object.rate_prof + 1e-9) * 100.0
-        #         df = pd.DataFrame(data=y, index=x, columns=[api_object.name])
-        #         ax_1.set_title('Loading', fontsize=14)
-        #         ax_1.set_ylabel('Loading [%]', fontsize=11)
-        #         df.plot(ax=ax_1)
-        #
-        #         # losses
-        #         y = api_object.Pset_prof * api_object.loss_factor
-        #         df = pd.DataFrame(data=y, index=x, columns=[api_object.name])
-        #         ax_2.set_title('Losses', fontsize=14)
-        #         ax_2.set_ylabel('Losses [MVA]', fontsize=11)
-        #         df.plot(ax=ax_2)
-        #
-        #         plt.legend()
-        #         fig.suptitle(api_object.name, fontsize=20)
-        #
-        #         plt.show()
-
     def set_rate_to_profile(self, api_object):
         """
 
@@ -541,27 +548,34 @@ class DiagramScene(QGraphicsScene):
                     else:
                         api_object.active_prof = np.zeros(shape, dtype=bool)
 
-    def mouseMoveEvent(self, mouseEvent):
-        """
-
-        @param mouseEvent:
-        @return:
-        """
-        self.parent_.scene_mouse_move_event(mouseEvent)
-
-        # call the parent event
-        super(DiagramScene, self).mouseMoveEvent(mouseEvent)
-
-    def mouseReleaseEvent(self, mouseEvent):
-        """
-
-        @param mouseEvent:
-        @return:
-        """
-        self.parent_.scene_mouse_release_event(mouseEvent)
-
-        # call mouseReleaseEvent on "me" (continue with the rest of the actions)
-        super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
+    # def mouseMoveEvent(self, event):
+    #     """
+    #
+    #     @param event:
+    #     @return:
+    #     """
+    #     # self.parent_.scene_mouse_move_event(event)
+    #
+    #     pos = self.mapToScene(event.pos())
+    #
+    #     if self.parent_.started_branch:
+    #         self.parent_.started_branch.setEndPos(pos)
+    #         self.scene().update(self.sceneRect())
+    #         return
+    #
+    #     # call the parent event
+    #     super(DiagramScene, self).mouseMoveEvent(event)
+    #
+    # def mouseReleaseEvent(self, event):
+    #     """
+    #
+    #     @param event:
+    #     @return:
+    #     """
+    #     self.parent_.scene_mouse_release_event(event)
+    #
+    #     # call mouseReleaseEvent on "me" (continue with the rest of the actions)
+    #     super(DiagramScene, self).mouseReleaseEvent(event)
 
 
 class ObjectFactory(object):
@@ -702,6 +716,7 @@ class GridEditor(QSplitter):
         if self.started_branch:
             pos = event.scenePos()
             self.started_branch.setEndPos(pos)
+            self.diagramScene.update(self.diagramScene.sceneRect())
 
     def scene_mouse_release_event(self, event):
         """
@@ -711,7 +726,7 @@ class GridEditor(QSplitter):
         """
         # Clear or finnish the started connection:
         if self.started_branch:
-            pos = event.scenePos()
+            pos = event.pos()
             items = self.diagramScene.items(pos)  # get the item (the terminal) at the mouse position
 
             for item in items:
@@ -786,7 +801,7 @@ class GridEditor(QSplitter):
                         obj.graphic_obj.setZValue(-1)
 
             # if self.started_branch.toPort is None:
-            self.started_branch.remove_widget()
+            # self.diagramScene.removeItem(self.started_branch)
 
         # release this pointer
         self.started_branch = None

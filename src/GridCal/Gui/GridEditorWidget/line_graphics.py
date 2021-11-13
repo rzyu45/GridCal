@@ -16,7 +16,8 @@ import numpy as np
 
 from GridCal.Gui.GuiFunctions import get_list_model
 from GridCal.Gui.GridEditorWidget.generic_graphics import *
-from GridCal.Gui.GridEditorWidget.bus_graphics import TerminalItem
+from GridCal.Gui.GridEditorWidget.terminal_item import TerminalItem
+from GridCal.Gui.GridEditorWidget.path_graphics import Path
 from GridCal.Gui.GridEditorWidget.messages import *
 from GridCal.Gui.GuiFunctions import BranchObjectModel
 from GridCal.Engine.Devices.line import Line, SequenceLineType, Tower, UndergroundLineType
@@ -248,7 +249,7 @@ class LineEditor(QDialog):
             self.load_template(template)
 
 
-class LineGraphicItem(QGraphicsLineItem):
+class LineGraphicItem(Path):
 
     def __init__(self, fromPort: TerminalItem, toPort: TerminalItem, diagramScene, width=5, branch: Line = None):
         """
@@ -259,7 +260,7 @@ class LineGraphicItem(QGraphicsLineItem):
         :param width:
         :param branch:
         """
-        QGraphicsLineItem.__init__(self, None)
+        Path.__init__(self)
 
         self.api_object = branch
         if self.api_object is not None:
@@ -283,6 +284,8 @@ class LineGraphicItem(QGraphicsLineItem):
         self.fromPort = None
         self.toPort = None
         self.diagramScene = diagramScene
+
+        self.clipPath()
 
         if fromPort:
             self.setFromPort(fromPort)
@@ -655,23 +658,23 @@ class LineGraphicItem(QGraphicsLineItem):
             self.toPort.posCallbacks.append(self.setEndPos)
             self.toPort.parent.setZValue(0)
 
-    def setEndPos(self, endpos):
+    def setEndPos(self, endpos: QPointF):
         """
         Set the starting position
         @param endpos:
         @return:
         """
         self.pos2 = endpos
-        self.redraw()
+        # self.redraw()
 
-    def setBeginPos(self, pos1):
+    def setBeginPos(self, pos1: QPointF):
         """
         Set the starting position
         @param pos1:
         @return:
         """
         self.pos1 = pos1
-        self.redraw()
+        # self.redraw()
 
     def redraw(self):
         """
@@ -681,7 +684,8 @@ class LineGraphicItem(QGraphicsLineItem):
         if self.pos1 is not None and self.pos2 is not None:
 
             # Set position
-            self.setLine(QLineF(self.pos1, self.pos2))
+            # self.setLine(QLineF(self.pos1, self.pos2))
+            # self.paint()
 
             # set Z-Order (to the back)
             self.setZValue(-1)

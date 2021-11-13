@@ -1,4 +1,19 @@
-import math, sys
+# This file is part of GridCal.
+#
+# GridCal is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GridCal is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GridCal.  If not, see <http://www.gnu.org/licenses/>.
+
+import math
 from PySide2 import QtWidgets, QtCore, QtGui
 
 
@@ -13,26 +28,26 @@ class Path(QtWidgets.QGraphicsPathItem):
     def __init__(self, source: QtCore.QPointF = None, destination: QtCore.QPointF = None, *args, **kwargs):
         super(Path, self).__init__(*args, **kwargs)
 
-        self._sourcePoint = source
-        self._destinationPoint = destination
+        self.pos1 = source
+        self.pos2 = destination
 
         self._arrow_height = 5
         self._arrow_width = 4
 
-    def set_source(self, point: QtCore.QPointF):
-        self._sourcePoint = point
+    def setBeginPos(self, point: QtCore.QPointF):
+        self.pos1 = point
 
-    def set_destination(self, point: QtCore.QPointF):
-        self._destinationPoint = point
+    def setEndPos(self, point: QtCore.QPointF):
+        self.pos2 = point
 
     def direct_path(self):
-        path = QtGui.QPainterPath(self._sourcePoint)
-        path.lineTo(self._destinationPoint)
+        path = QtGui.QPainterPath(self.pos1)
+        path.lineTo(self.pos2)
         return path
 
     def square_path(self):
-        s = self._sourcePoint
-        d = self._destinationPoint
+        s = self.pos1
+        d = self.pos2
 
         mid_x = s.x() + ((d.x() - s.x()) * 0.5)
 
@@ -44,8 +59,8 @@ class Path(QtWidgets.QGraphicsPathItem):
         return path
 
     def bezier_path(self):
-        s = self._sourcePoint
-        d = self._destinationPoint
+        s = self.pos1
+        d = self.pos2
 
         source_x, source_y = s.x(), s.y()
         destination_x, destination_y = d.x(), d.y()
@@ -65,7 +80,7 @@ class Path(QtWidgets.QGraphicsPathItem):
 
             cpy_s = ((destination_y - source_y) / math.fabs((destination_y - source_y) if (destination_y - source_y) != 0 else 0.00001)) * 150
 
-        path = QtGui.QPainterPath(self._sourcePoint)
+        path = QtGui.QPainterPath(self.pos1)
 
         path.cubicTo(destination_x + cpx_d, destination_y + cpy_d, source_x + cpx_s, source_y + cpy_s,
                      destination_x, destination_y)
@@ -78,10 +93,10 @@ class Path(QtWidgets.QGraphicsPathItem):
             startPoint, endPoint = start_point, end_point
 
             if start_point is None:
-                startPoint = self._sourcePoint
+                startPoint = self.pos1
 
             if endPoint is None:
-                endPoint = self._destinationPoint
+                endPoint = self.pos2
 
             dx, dy = startPoint.x() - endPoint.x(), startPoint.y() - endPoint.y()
 
@@ -120,69 +135,6 @@ class Path(QtWidgets.QGraphicsPathItem):
         self.setPath(path)
 
         # triangle_source = self.arrowCalc(path.pointAtPercent(0.1), self._sourcePoint)  # change path.PointAtPercent() value to move arrow on the line
-        triangle_source = self.arrow_calc(path.pointAtPercent(0.51), path.pointAtPercent(0.5))
+        triangle_source = self.arrow_calc(path.pointAtPercent(0.5), path.pointAtPercent(0.51))
         if triangle_source is not None:
             painter.drawPolyline(triangle_source)
-
-
-class ViewPort(QtWidgets.QGraphicsView):
-
-    def __init__(self):
-        super(ViewPort, self).__init__()
-
-        self.setViewportUpdateMode(self.FullViewportUpdate)
-
-        self._is_drawing_path = False
-        self._current_path: Path = None
-
-    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-
-        if event.button() == QtCore.Qt.LeftButton:
-
-            pos = self.mapToScene(event.pos())
-            self._is_drawing_path = True
-            self._current_path = Path(source=pos, destination=pos)
-            self.scene().addItem(self._current_path)
-
-            return
-
-        super(ViewPort, self).mousePressEvent(event)
-
-    def mouseMoveEvent(self, event):
-
-        pos = self.mapToScene(event.pos())
-
-        if self._is_drawing_path:
-            self._current_path.set_destination(pos)
-            self.scene().update(self.sceneRect())
-            return
-
-        super(ViewPort, self).mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
-
-        pos = self.mapToScene(event.pos())
-
-        if self._is_drawing_path:
-            self._current_path.set_destination(pos)
-            self._is_drawing_path = False
-            self._current_path = None
-            self.scene().update(self.sceneRect())
-            return
-
-        super(ViewPort, self).mouseReleaseEvent(event)
-
-
-def main():
-    app = QtWidgets.QApplication(sys.argv)
-
-    window = ViewPort()
-    scene = QtWidgets.QGraphicsScene()
-    window.setScene(scene)
-    window.show()
-
-    sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()

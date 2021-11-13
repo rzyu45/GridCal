@@ -18,7 +18,6 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 
 from GridCal.Gui.GridEditorWidget.generic_graphics import ACTIVE, DEACTIVATED, FONT_SCALE, EMERGENCY
-# from GridCal.Gui.GridEditorWidget.editor import GridEditor
 
 
 class TerminalItem(QGraphicsRectItem):

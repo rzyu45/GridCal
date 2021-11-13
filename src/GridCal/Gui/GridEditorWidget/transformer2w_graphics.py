@@ -325,8 +325,8 @@ class TransformerGraphicItem(QGraphicsLineItem):
 
         self.pos1 = None
         self.pos2 = None
-        self.fromPort = None
-        self.toPort = None
+        self.fromPort: TerminalItem = None
+        self.toPort: TerminalItem = None
         self.diagramScene = diagramScene
 
         if fromPort:
